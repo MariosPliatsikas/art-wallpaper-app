@@ -7,6 +7,8 @@ function App() {
   const artwork = useArtwork();
   const [zoom, setZoom] = useState(1);
   const [backgroundPosition, setBackgroundPosition] = useState('center');
+  const [intervalTime, setIntervalTime] = useState(15000); // default interval time
+  const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -15,10 +17,10 @@ function App() {
       const newPositionY = Math.random() * 100;
       setZoom(newZoom);
       setBackgroundPosition(`${newPositionX}% ${newPositionY}%`);
-    }, 15000); // Αλλαγή κάθε 15 δευτερόλεπτα
+    }, intervalTime); // Χρήση του προσαρμοσμένου διαστήματος
 
     return () => clearInterval(interval);
-  }, []);
+  }, [intervalTime]);
 
   if (!artwork) {
     return <div>Loading...</div>;
@@ -26,6 +28,21 @@ function App() {
 
   return (
     <div className="App" style={{ backgroundImage: `url(${artwork.primaryImage})`, backgroundSize: `${zoom * 100}%`, backgroundPosition }}>
+      <div className="header">
+        <button onClick={() => setShowSettings(!showSettings)}>Ρυθμίσεις</button>
+      </div>
+      {showSettings && (
+        <div className="settings">
+          <label>
+            Διάστημα Χρόνου (δευτερόλεπτα):
+            <input type="number" value={intervalTime / 1000} onChange={(e) => setIntervalTime(e.target.value * 1000)} />
+          </label>
+          <label>
+            Επίπεδο Zoom:
+            <input type="number" value={zoom} onChange={(e) => setZoom(e.target.value)} />
+          </label>
+        </div>
+      )}
       <ArtworkInfo artwork={artwork} />
     </div>
   );
