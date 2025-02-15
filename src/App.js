@@ -5,7 +5,7 @@ import './App.css';
 
 function App() {
   const artwork = useArtwork();
-  const [backgroundPosition, setBackgroundPosition] = useState('center');
+  const [backgroundPositionX, setBackgroundPositionX] = useState('50%');
   const [intervalTime, setIntervalTime] = useState(15000); // default interval time
   const [showSettings, setShowSettings] = useState(false);
   const [hideText, setHideText] = useState(false);
@@ -13,8 +13,7 @@ function App() {
   useEffect(() => {
     const interval = setInterval(() => {
       const newPositionX = Math.random() * 100;
-      const newPositionY = Math.random() * 100;
-      setBackgroundPosition(`${newPositionX}% ${newPositionY}%`);
+      setBackgroundPositionX(`${newPositionX}%`);
     }, intervalTime); // Χρήση του προσαρμοσμένου διαστήματος
 
     return () => clearInterval(interval);
@@ -33,7 +32,7 @@ function App() {
   }
 
   return (
-    <div className="App" style={{ backgroundImage: `url(${artwork.primaryImage})`, backgroundPosition }}>
+    <div className="App" style={{ backgroundImage: `url(${artwork.primaryImage})`, backgroundPosition: `${backgroundPositionX} center`, backgroundSize: 'contain' }}>
       <div className="header">
         <button onClick={() => setShowSettings(!showSettings)}>Ρυθμίσεις</button>
       </div>
