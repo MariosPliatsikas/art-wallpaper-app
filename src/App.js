@@ -9,6 +9,7 @@ function App() {
   const [backgroundPosition, setBackgroundPosition] = useState('center');
   const [intervalTime, setIntervalTime] = useState(15000); // default interval time
   const [showSettings, setShowSettings] = useState(false);
+  const [hideText, setHideText] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -21,6 +22,14 @@ function App() {
 
     return () => clearInterval(interval);
   }, [intervalTime]);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setHideText(true);
+    }, 15000); // Απόκρυψη μετά από 15 δευτερόλεπτα
+
+    return () => clearTimeout(timeout);
+  }, []);
 
   if (!artwork) {
     return <div>Loading...</div>;
@@ -43,7 +52,7 @@ function App() {
           </label>
         </div>
       )}
-      <ArtworkInfo artwork={artwork} />
+      {!hideText && <ArtworkInfo artwork={artwork} />}
     </div>
   );
 }
