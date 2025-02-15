@@ -46,6 +46,10 @@ function App() {
         </div>
       )}
       {!hideText && <ArtworkInfo artwork={artwork} />}
+      <div className="bottom-right">
+        <h1>{artwork.title}</h1>
+        <p>{artwork.objectDate}</p>
+      </div>
     </div>
   );
 }
