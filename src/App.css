@@ -40,3 +40,14 @@
   border: none;
   border-radius: 3px;
 }
+
+.bottom-right {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  text-align: right;
+}
+
+.description {
+  display: none; /* Απόκρυψη του αρχικού περιεχομένου */
+}
