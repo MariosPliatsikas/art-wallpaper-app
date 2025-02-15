@@ -9,8 +9,10 @@
   color: white;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
   background-color: black;
-  background-size: cover;
+  background-size: contain;
   background-position: center;
+  background-repeat: no-repeat;
+  transition: background-position 1s ease-in-out;
 }
 
 .header {
