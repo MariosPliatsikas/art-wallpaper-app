@@ -7,7 +7,6 @@ function App() {
   const artwork = useArtwork();
   const [backgroundPositionX, setBackgroundPositionX] = useState('50%');
   const [intervalTime, setIntervalTime] = useState(15000); // default interval time
-  const [showSettings, setShowSettings] = useState(false);
   const [hideText, setHideText] = useState(false);
 
   useEffect(() => {
@@ -33,17 +32,6 @@ function App() {
 
   return (
     <div className="App" style={{ backgroundImage: `url(${artwork.primaryImage})`, backgroundPosition: `${backgroundPositionX} center`, backgroundSize: 'contain' }}>
-      <div className="header">
-        <button onClick={() => setShowSettings(!showSettings)}>Ρυθμίσεις</button>
-      </div>
-      {showSettings && (
-        <div className="settings">
-          <label>
-            Διάστημα Χρόνου (δευτερόλεπτα):
-            <input type="number" value={intervalTime / 1000} onChange={(e) => setIntervalTime(e.target.value * 1000)} />
-          </label>
-        </div>
-      )}
       {!hideText && <ArtworkInfo artwork={artwork} />}
       <div className="bottom-right">
         <h1>{artwork.title}</h1>
