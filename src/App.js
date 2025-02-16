@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useArtwork } from './useArtwork';
 import ArtworkInfo from './ArtworkInfo';
 import './App.css';
@@ -41,15 +41,15 @@ function App() {
     });
   }, []);
 
+  const MemoizedArtworkInfo = useMemo(() => React.memo(ArtworkInfo), []);
+
+  const handleTextClick = useCallback(() => {
+    setShowText(true);
+  }, []);
+
   if (!artwork) {
     return <div>Loading...</div>;
   }
-
-  const MemoizedArtworkInfo = React.memo(ArtworkInfo);
-
-  const handleTextClick = () => {
-    setShowText(true);
-  };
 
   return (
     <div
@@ -59,7 +59,7 @@ function App() {
         backgroundPosition: 'center',
         backgroundSize: 'contain',
       }}
-      onClick={handleTextClick}
+      onClick={handleTextClick} // Προσθήκη χειριστή κλικ
     >
       {!hideText && <MemoizedArtworkInfo artwork={artwork} />}
       {showText && (
