@@ -8,4 +8,4 @@ function ArtworkInfo({ artwork }) {
   );
 }
 
-export default ArtworkInfo;
+export default React.memo(ArtworkInfo); // Χρησιμοποιήστε React.memo για βελτίωση απόδοσης
