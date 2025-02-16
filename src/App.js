@@ -8,17 +8,18 @@ import { useNavigate } from 'react-router-dom'; // Προσθέστε την β�
 function App() {
   const artwork = useArtwork();
   const [hideText, setHideText] = useState(false);
+  const [showText, setShowText] = useState(true); // Νέα κατάσταση για την εμφάνιση του τίτλου και της ημερομηνίας
   const navigate = useNavigate(); // Δημιουργία ιστορικού για ανακατεύθυνση
 
   useEffect(() => {
-    if (!hideText) {
+    if (showText) {
       const timeout = setTimeout(() => {
-        setHideText(true);
-      }, 15000); // Απόκρυψη μετά από 15 δευτερόλεπτα
+        setShowText(false);
+      }, 10000); // Απόκρυψη μετά από 10 δευτερόλεπτα
 
       return () => clearTimeout(timeout);
     }
-  }, [hideText]);
+  }, [showText]);
 
   useEffect(() => {
     if (!artwork) {
@@ -32,6 +33,10 @@ function App() {
 
   const MemoizedArtworkInfo = React.memo(ArtworkInfo);
 
+  const handleTextClick = () => {
+    setShowText(true);
+  };
+
   return (
     <div
       className="App"
@@ -40,12 +45,15 @@ function App() {
         backgroundPosition: 'center',
         backgroundSize: 'contain', // Εφαρμογή ζουμ
       }}
+      onClick={handleTextClick} // Προσθήκη χειριστή κλικ
     >
       {!hideText && <MemoizedArtworkInfo artwork={artwork} />}
-      <div className="floating-text">
-        <h1>{artwork.title}</h1>
-        <p>{artwork.objectDate}</p>
-      </div>
+      {showText && (
+        <div className="floating-text">
+          <h1>{artwork.title}</h1>
+          <p>{artwork.objectDate}</p>
+        </div>
+      )}
     </div>
   );
 }
