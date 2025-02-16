@@ -1,4 +1,3 @@
-// src/useArtwork.js
 import { useEffect, useState } from 'react';
 import { fetchArtwork } from './api';
 
