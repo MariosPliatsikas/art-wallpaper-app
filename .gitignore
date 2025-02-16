@@ -22,3 +22,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .env
+
+# Custom ignores
+src/ThreeScene.js
+src/ai.js
+webpack.config.js
