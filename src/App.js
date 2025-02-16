@@ -4,7 +4,6 @@ import { useArtwork } from './useArtwork';
 import ArtworkInfo from './ArtworkInfo';
 import './App.css';
 import { useNavigate } from 'react-router-dom';
-import SC from './soundcloud'; // Εισαγωγή του SoundCloud SDK
 
 function App() {
   const artwork = useArtwork();
@@ -30,15 +29,18 @@ function App() {
   }, [artwork, navigate]);
 
   useEffect(() => {
-    // Αναζήτηση και αναπαραγωγή ενός track από το SoundCloud
-    SC.get('/tracks', { q: 'ambient', license: 'cc-by-sa' }).then((tracks) => {
-      if (tracks.length > 0) {
-        setTrack(tracks[0]);
-        SC.stream(`/tracks/${tracks[0].id}`).then((player) => {
-          player.play();
-        });
-      }
-    });
+    // Αναζήτηση και αναπαραγωγή ενός track από το MusicBrainz
+    fetch('https://musicbrainz.org/ws/2/recording/?query=ambient&fmt=json')
+      .then(response => response.json())
+      .then(data => {
+        console.log('Tracks:', data);
+        if (data.recordings && data.recordings.length > 0) {
+          setTrack(data.recordings[0]);
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching tracks:', error);
+      });
   }, []);
 
   const MemoizedArtworkInfo = useMemo(() => React.memo(ArtworkInfo), []);
@@ -59,7 +61,7 @@ function App() {
         backgroundPosition: 'center',
         backgroundSize: 'contain',
       }}
-      onClick={handleTextClick} // Προσθήκη χειριστή κλικ
+      onClick={handleTextClick}
     >
       {!hideText && <MemoizedArtworkInfo artwork={artwork} />}
       {showText && (
