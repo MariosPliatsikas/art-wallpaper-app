@@ -4,7 +4,6 @@
   width: 100%;
   height: 100vh;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
   color: white;
@@ -13,7 +12,6 @@
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
-  transition: background-position 60s linear, background-size 0.5s ease; /* Ομαλή μετάβαση ζουμ και θέση */
 }
 
 .header {
@@ -57,20 +55,29 @@
 
 .floating-text {
   position: absolute;
-  animation: float 10s ease-in-out infinite;
+  animation: float 20s ease-in-out infinite;
   font-family: 'Arial', sans-serif; /* Διακριτική γραμματοσειρά */
   color: rgba(255, 255, 255, 0.8); /* Διακριτικό χρώμα */
   text-align: center;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 @keyframes float {
   0% {
-    transform: translate(0, 0);
+    transform: translate(-50%, -50%);
+  }
+  25% {
+    transform: translate(calc(-50% + 10px), calc(-50% + 10px));
   }
   50% {
-    transform: translate(20px, 20px);
+    transform: translate(calc(-50% - 10px), calc(-50% - 10px));
+  }
+  75% {
+    transform: translate(calc(-50% + 10px), calc(-50% - 10px));
   }
   100% {
-    transform: translate(0, 0);
+    transform: translate(-50%, -50%);
   }
 }

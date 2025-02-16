@@ -7,26 +7,8 @@ import { useNavigate } from 'react-router-dom'; // Προσθέστε την β�
 
 function App() {
   const artwork = useArtwork();
-  const [backgroundPositionX, setBackgroundPositionX] = useState('50%');
   const [hideText, setHideText] = useState(false);
-  const [zoom, setZoom] = useState(false); // Νέα κατάσταση για το ζουμ
   const navigate = useNavigate(); // Δημιουργία ιστορικού για ανακατεύθυνση
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const newPositionX = Math.random() * 100;
-      setBackgroundPositionX(`${newPositionX}%`);
-
-      // Ελέγξτε αν η εικόνα βρίσκεται στη μέση της οθόνης
-      if (newPositionX >= 45 && newPositionX <= 55) {
-        setZoom(true);
-      } else {
-        setZoom(false);
-      }
-    }, 60000); // Αυξήστε το διάστημα για πιο αργές ενημερώσεις
-
-    return () => clearInterval(interval);
-  }, []);
 
   useEffect(() => {
     if (!hideText) {
@@ -55,9 +37,8 @@ function App() {
       className="App"
       style={{
         backgroundImage: `url(${artwork.primaryImage})`,
-        backgroundPosition: `${backgroundPositionX} center`,
-        backgroundSize: zoom ? '120%' : 'contain', // Εφαρμογή ζουμ
-        transition: 'background-position 60s linear, background-size 0.5s ease', // Ομαλή μετάβαση ζουμ και θέση
+        backgroundPosition: 'center',
+        backgroundSize: 'contain', // Εφαρμογή ζουμ
       }}
     >
       {!hideText && <MemoizedArtworkInfo artwork={artwork} />}
