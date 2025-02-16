@@ -7,6 +7,7 @@
     "@react-three/fiber": "^8.17.14",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
+    "react-router-dom": "^7.1.5",
     "react-scripts": "^5.0.1",
     "three": "^0.173.0"
   },

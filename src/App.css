@@ -1,3 +1,4 @@
+
 .App {
   position: relative;
   width: 100%;
@@ -12,7 +13,7 @@
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
-  transition: background-position 1s ease-in-out;
+  transition: background-position 60s linear, background-size 0.5s ease; /* Ομαλή μετάβαση ζουμ και θέση */
 }
 
 .header {
@@ -52,4 +53,24 @@
 
 .description {
   display: none; /* Απόκρυψη του αρχικού περιεχομένου */
+}
+
+.floating-text {
+  position: absolute;
+  animation: float 10s ease-in-out infinite;
+  font-family: 'Arial', sans-serif; /* Διακριτική γραμματοσειρά */
+  color: rgba(255, 255, 255, 0.8); /* Διακριτικό χρώμα */
+  text-align: center;
+}
+
+@keyframes float {
+  0% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(20px, 20px);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
 }

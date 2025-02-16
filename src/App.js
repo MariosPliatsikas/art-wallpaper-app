@@ -1,24 +1,32 @@
+
 import React, { useEffect, useState } from 'react';
 import { useArtwork } from './useArtwork';
 import ArtworkInfo from './ArtworkInfo';
 import './App.css';
-import { useHistory } from 'react-router-dom'; // Προσθέστε την βιβλιοθήκη για ανακατεύθυνση
+import { useNavigate } from 'react-router-dom'; // Προσθέστε την βιβλιοθήκη για ανακατεύθυνση
 
 function App() {
   const artwork = useArtwork();
   const [backgroundPositionX, setBackgroundPositionX] = useState('50%');
-  const [intervalTime, setIntervalTime] = useState(30000); // Αυξήστε το διάστημα για λιγότερες ενημερώσεις
   const [hideText, setHideText] = useState(false);
-  const history = useHistory(); // Δημιουργία ιστορικού για ανακατεύθυνση
+  const [zoom, setZoom] = useState(false); // Νέα κατάσταση για το ζουμ
+  const navigate = useNavigate(); // Δημιουργία ιστορικού για ανακατεύθυνση
 
   useEffect(() => {
     const interval = setInterval(() => {
       const newPositionX = Math.random() * 100;
       setBackgroundPositionX(`${newPositionX}%`);
-    }, intervalTime);
+
+      // Ελέγξτε αν η εικόνα βρίσκεται στη μέση της οθόνης
+      if (newPositionX >= 45 && newPositionX <= 55) {
+        setZoom(true);
+      } else {
+        setZoom(false);
+      }
+    }, 60000); // Αυξήστε το διάστημα για πιο αργές ενημερώσεις
 
     return () => clearInterval(interval);
-  }, [intervalTime]);
+  }, []);
 
   useEffect(() => {
     if (!hideText) {
@@ -32,9 +40,9 @@ function App() {
 
   useEffect(() => {
     if (!artwork) {
-      history.push('/next-page'); // Ανακατεύθυνση στην επόμενη σελίδα αν δεν υπάρχει έργο
+      navigate('/next-page'); // Ανακατεύθυνση στην επόμενη σελίδα αν δεν υπάρχει έργο
     }
-  }, [artwork, history]);
+  }, [artwork, navigate]);
 
   if (!artwork) {
     return <div>Loading...</div>;
@@ -43,9 +51,17 @@ function App() {
   const MemoizedArtworkInfo = React.memo(ArtworkInfo);
 
   return (
-    <div className="App" style={{ backgroundImage: `url(${artwork.primaryImage})`, backgroundPosition: `${backgroundPositionX} center`, backgroundSize: 'contain' }}>
+    <div
+      className="App"
+      style={{
+        backgroundImage: `url(${artwork.primaryImage})`,
+        backgroundPosition: `${backgroundPositionX} center`,
+        backgroundSize: zoom ? '120%' : 'contain', // Εφαρμογή ζουμ
+        transition: 'background-position 60s linear, background-size 0.5s ease', // Ομαλή μετάβαση ζουμ και θέση
+      }}
+    >
       {!hideText && <MemoizedArtworkInfo artwork={artwork} />}
-      <div className="bottom-right">
+      <div className="floating-text">
         <h1>{artwork.title}</h1>
         <p>{artwork.objectDate}</p>
       </div>
