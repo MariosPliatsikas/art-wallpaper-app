@@ -59,9 +59,10 @@
   font-family: 'Arial', sans-serif; /* Διακριτική γραμματοσειρά */
   color: rgba(255, 255, 255, 0.8); /* Διακριτικό χρώμα */
   text-align: center;
-  top: 50%;
+  top: 70%; /* Μετακίνηση πιο κάτω στην οθόνη */
   left: 50%;
   transform: translate(-50%, -50%);
+  font-size: 1.5rem; /* Μικρότερη γραμματοσειρά */
 }
 
 @keyframes float {
