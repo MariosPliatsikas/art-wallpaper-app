@@ -28,5 +28,4 @@ src/ThreeScene.js
 src/ai.js
 webpack.config.js
 
-# Custom ignores
-config.js
+
