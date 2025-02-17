@@ -3,7 +3,7 @@ import { useArtwork } from './useArtwork';
 import ArtworkInfo from './ArtworkInfo';
 import './App.css';
 import { useNavigate } from 'react-router-dom';
-import config from './config'; // Εισαγωγή του config.js
+import config from './config.js';
 
 function App() {
   const artwork = useArtwork();
