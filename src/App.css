@@ -14,6 +14,66 @@
   background-repeat: no-repeat;
 }
 
+.App.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
+  color: white;
+  background-color: black;
+}
+
+.artwork-info {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 10px;
+  border-radius: 5px;
+  color: white;
+  font-size: 1rem;
+  max-width: 300px;
+}
+
+.artwork-info p {
+  margin: 5px 0;
+}
+
+.artist-name {
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.artwork-title {
+  font-style: italic;
+}
+
+.artwork-date {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.artwork-medium {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.loading-spinner {
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid white;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 .header {
   position: absolute;
   top: 10px;
@@ -50,29 +110,30 @@
 }
 
 .description {
-  display: none; /* Απόκρυψη του αρχικού περιεχομένου */
+  display: none;
 }
 
 .floating-text {
   position: absolute;
-  animation: float 20s ease-in-out infinite;
-  font-family: 'Arial', sans-serif; /* Διακριτική γραμματοσειρά */
-  color: rgba(255, 255, 255, 0.8); /* Διακριτικό χρώμα */
-  text-align: center;
-  top: 70%; /* Μετακίνηση πιο κάτω στην οθόνη */
+  top: 70%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 1.5rem; /* Μικρότερη γραμματοσειρά */
-  transition: opacity 0.5s ease-in-out; /* Ομαλή μετάβαση εμφάνισης/εξαφάνισης */
+  font-family: 'Arial', sans-serif;
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  font-size: 1.5rem;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+  animation: float 20s ease-in-out infinite;
 }
 
-.floating-text.hidden {
-  opacity: 0;
+.floating-text.visible {
+  opacity: 1;
 }
 
 .track-info {
   position: absolute;
-  bottom: 20px;
+  bottom: 10px;
   left: 50%;
   transform: translateX(-50%);
   background: rgba(0, 0, 0, 0.5);
@@ -80,6 +141,12 @@
   border-radius: 5px;
   font-size: 1rem;
   color: white;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
+
+.track-info.visible {
+  opacity: 1;
 }
 
 @keyframes float {
