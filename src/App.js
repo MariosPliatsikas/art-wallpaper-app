@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { useArtwork } from './useArtwork';
+import useArtwork from './useArtwork';  // Εισαγωγή ως default export
 import ArtworkInfo from './ArtworkInfo';
 import FloatingText from './components/FloatingText/FloatingText';
 import TrackInfo from './components/TrackInfo/TrackInfo';
