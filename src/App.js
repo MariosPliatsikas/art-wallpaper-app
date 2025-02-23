@@ -1,56 +1,70 @@
+
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { useArtwork } from './useArtwork';
+import useArtwork from './useArtwork';  // Εισαγωγή ως default export
 import ArtworkInfo from './ArtworkInfo';
+import FloatingText from './components/FloatingText/FloatingText';
+import TrackInfo from './components/TrackInfo/TrackInfo';
 import './App.css';
 import { useNavigate } from 'react-router-dom';
 import config from './config';
 
 function App() {
   const artwork = useArtwork();
-  const [hideText, setHideText] = useState(false);
-  const [showText, setShowText] = useState(true);
-  const [track, setTrack] = useState(null); // Νέα κατάσταση για το track
+  const [hideText] = useState(false);
+  const [showText, setShowText] = useState(false); // Αρχικά false, θα εμφανιστεί μετά από 15 δευτερόλεπτα
+  const [track, setTrack] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {   
+  // Timer για το κείμενο (15 δευτερόλεπτα)
+  useEffect(() => {
+    const textTimer = setTimeout(() => {
+      setShowText(true);
+    }, 15000);
+
+    return () => clearTimeout(textTimer);
+  }, []);
+
+  // Timer για απόκρυψη του κειμένου (10 δευτερόλεπτα μετά την εμφάνιση)
+  useEffect(() => {
     if (showText) {
-      const timeout = setTimeout(() => {
+      const hideTimer = setTimeout(() => {
         setShowText(false);
       }, 10000);
-   
-      return () => clearTimeout(timeout);
+
+      return () => clearTimeout(hideTimer);
     }
   }, [showText]);
-      
+
+  // Ανακατεύθυνση αν δεν υπάρχει έργο τέχνης
   useEffect(() => {
     if (!artwork) {
       navigate('/next-page');
     }
   }, [artwork, navigate]);
-      
+
+  // Αναζήτηση τραγουδιού από το ListenBrainz
   useEffect(() => {
-    // Αναζήτηση και αναπαραγωγή ενός track από το ListenBrainz
     fetch('https://api.listenbrainz.org/1/stats/user/MariosPliatsikas/play-count', {
       headers: {
-        'Authorization': `Bearer ${config.MUSIC_API_TOKEN}`
-      }
+        'Authorization': `Bearer ${config.MUSIC_API_TOKEN}`,
+      },
     })
-      .then(response => response.json())
-      .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         console.log('Tracks:', data);
         if (data.play_count && data.play_count.length > 0) {
           setTrack(data.play_count[0]);
         }
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error fetching tracks:', error);
       });
-  }, []); 
-    
+  }, []);
+
   const MemoizedArtworkInfo = useMemo(() => React.memo(ArtworkInfo), []);
 
   const handleTextClick = useCallback(() => {
-    setShowText(true);
+    setShowText(true); // Εμφάνιση κειμένου όταν ο χρήστης κάνει κλικ
   }, []);
 
   if (!artwork) {
@@ -68,17 +82,8 @@ function App() {
       onClick={handleTextClick}
     >
       {!hideText && <MemoizedArtworkInfo artwork={artwork} />}
-      {showText && (       
-        <div className="floating-text"> 
-          <h1>{artwork.title}</h1>
-          <p>{artwork.objectDate}</p>
-        </div>
-      )}
-      {track && (
-        <div className="track-info">
-          <p>Now playing: {track.title}</p>
-        </div>
-      )} 
+      {showText && <FloatingText title={artwork.title} date={artwork.objectDate} />}
+      {track && <TrackInfo track={track} />}
     </div>
   );
 }

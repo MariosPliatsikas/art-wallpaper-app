@@ -1,11 +1,45 @@
-export async function fetchArtwork() {
-  const response = await fetch('https://collectionapi.metmuseum.org/public/collection/v1/search?hasImages=true&q=painting');
-  const data = await response.json();
-  const randomIndex = Math.floor(Math.random() * data.objectIDs.length);
-  const artworkID = data.objectIDs[randomIndex];
+export async function fetchArtwork(query = 'painting') {
+  try {
+    // Βήμα 1: Αναζήτηση για έργα τέχνης
+    const searchResponse = await fetch(
+      
+`https://collectionapi.metmuseum.org/public/collection/v1/search?hasImages=true&q=${query}`
+    );
 
-  const res = await fetch(`https://collectionapi.metmuseum.org/public/collection/v1/objects/${artworkID}`);
-  const artwork = await res.json();
+    if (!searchResponse.ok) {
+      throw new Error('Failed to fetch artwork list');
+    }
 
-  return artwork;
+    const searchData = await searchResponse.json();
+
+    // Έλεγχος αν υπάρχουν διαθέσιμα έργα τέχνης
+    if (!searchData.objectIDs || searchData.objectIDs.length === 0) {
+      throw new Error('No artworks found');
+    }
+
+    // Επιλογή τυχαίου έργου τέχνης
+    const randomIndex = Math.floor(Math.random() * searchData.objectIDs.length);
+    const artworkID = searchData.objectIDs[randomIndex];
+
+    // Βήμα 2: Ανάκτηση λεπτομερειών για το συγκεκριμένο έργο τέχνης
+    const artworkResponse = await fetch(
+      `https://collectionapi.metmuseum.org/public/collection/v1/objects/${artworkID}`
+    );
+
+    if (!artworkResponse.ok) {
+      throw new Error('Failed to fetch artwork details');
+    }
+
+    const artwork = await artworkResponse.json();
+
+    // Έλεγχος αν το έργο έχει εικόνα
+    if (!artwork.primaryImage || artwork.primaryImage === '') {
+      throw new Error('Artwork has no image');
+    }
+
+    return artwork;
+  } catch (error) {
+    console.error('Error fetching artwork:', error);
+    return null; // Επιστροφή null σε περίπτωση σφάλματος
+  }
 }
