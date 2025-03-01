@@ -7,6 +7,7 @@ import TrackInfo from './components/TrackInfo/TrackInfo';
 import './App.css';
 import { useNavigate } from 'react-router-dom';
 import config from './config';
+import { saveFavorite } from './database'; // Προσθήκη της λειτουργίας αποθήκευσης
 
 function App() {
   const artwork = useArtwork();
@@ -14,7 +15,6 @@ function App() {
   const [showText, setShowText] = useState(false); // Αρχικά false, θα εμφανιστεί μετά από 15 δευτερόλεπτα
   const [track, setTrack] = useState(null);
   const [favorites, setFavorites] = useState([]);
-  const [zoom, setZoom] = useState(1);
   const navigate = useNavigate();
 
   // Timer για το κείμενο (15 δευτερόλεπτα)
@@ -71,10 +71,8 @@ function App() {
 
   const addToFavorites = (item) => {
     setFavorites([...favorites, item]);
+    saveFavorite(item); // Αποθήκευση του αγαπημένου στη βάση δεδομένων
   };
-
-  const zoomIn = () => setZoom(zoom + 0.1);
-  const zoomOut = () => setZoom(zoom - 0.1);
 
   if (!artwork) {
     return <div>Loading...</div>;
@@ -87,17 +85,12 @@ function App() {
         backgroundImage: `url(${artwork.primaryImage})`,
         backgroundPosition: 'center',
         backgroundSize: 'contain',
-        transform: `scale(${zoom})`,
       }}
       onClick={handleTextClick}
     >
       {!hideText && <MemoizedArtworkInfo artwork={artwork} />}
       {showText && <FloatingText title={artwork.title} date={artwork.objectDate} />}
       {track && <TrackInfo track={track} />}
-      <div className="zoom-buttons">
-        <button className="zoom-button" onClick={zoomIn}>+</button>
-        <button className="zoom-button" onClick={zoomOut}>-</button>
-      </div>
       <button className="favorite-button" onClick={() => addToFavorites(artwork)}>❤️</button>
     </div>
   );
