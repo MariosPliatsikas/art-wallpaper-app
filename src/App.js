@@ -13,6 +13,8 @@ function App() {
   const [hideText] = useState(false);
   const [showText, setShowText] = useState(false); // Αρχικά false, θα εμφανιστεί μετά από 15 δευτερόλεπτα
   const [track, setTrack] = useState(null);
+  const [favorites, setFavorites] = useState([]);
+  const [zoom, setZoom] = useState(1);
   const navigate = useNavigate();
 
   // Timer για το κείμενο (15 δευτερόλεπτα)
@@ -67,6 +69,13 @@ function App() {
     setShowText(true); // Εμφάνιση κειμένου όταν ο χρήστης κάνει κλικ
   }, []);
 
+  const addToFavorites = (item) => {
+    setFavorites([...favorites, item]);
+  };
+
+  const zoomIn = () => setZoom(zoom + 0.1);
+  const zoomOut = () => setZoom(zoom - 0.1);
+
   if (!artwork) {
     return <div>Loading...</div>;
   }
@@ -78,12 +87,16 @@ function App() {
         backgroundImage: `url(${artwork.primaryImage})`,
         backgroundPosition: 'center',
         backgroundSize: 'contain',
+        transform: `scale(${zoom})`,
       }}
       onClick={handleTextClick}
     >
       {!hideText && <MemoizedArtworkInfo artwork={artwork} />}
       {showText && <FloatingText title={artwork.title} date={artwork.objectDate} />}
       {track && <TrackInfo track={track} />}
+      <button style={{ opacity: 0.5 }} onClick={zoomIn}>+</button>
+      <button style={{ opacity: 0.5 }} onClick={zoomOut}>-</button>
+      <button onClick={() => addToFavorites(artwork)}>Add to Favorites</button>
     </div>
   );
 }
