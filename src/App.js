@@ -7,12 +7,14 @@ import TrackInfo from './components/TrackInfo/TrackInfo';
 import './App.css';
 import { useNavigate } from 'react-router-dom';
 import config from './config';
+import { saveFavorite } from './database'; // Προσθήκη της λειτουργίας αποθήκευσης
 
 function App() {
   const artwork = useArtwork();
   const [hideText] = useState(false);
   const [showText, setShowText] = useState(false); // Αρχικά false, θα εμφανιστεί μετά από 15 δευτερόλεπτα
   const [track, setTrack] = useState(null);
+  const [favorites, setFavorites] = useState([]);
   const navigate = useNavigate();
 
   // Timer για το κείμενο (15 δευτερόλεπτα)
@@ -67,6 +69,11 @@ function App() {
     setShowText(true); // Εμφάνιση κειμένου όταν ο χρήστης κάνει κλικ
   }, []);
 
+  const addToFavorites = (item) => {
+    setFavorites([...favorites, item]);
+    saveFavorite(item); // Αποθήκευση του αγαπημένου στη βάση δεδομένων
+  };
+
   if (!artwork) {
     return <div>Loading...</div>;
   }
@@ -84,6 +91,7 @@ function App() {
       {!hideText && <MemoizedArtworkInfo artwork={artwork} />}
       {showText && <FloatingText title={artwork.title} date={artwork.objectDate} />}
       {track && <TrackInfo track={track} />}
+      <button className="favorite-button" onClick={() => addToFavorites(artwork)}>❤️</button>
     </div>
   );
 }
