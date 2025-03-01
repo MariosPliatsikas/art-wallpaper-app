@@ -15,6 +15,7 @@ function App() {
   const [track, setTrack] = useState(null);
   const [favorites, setFavorites] = useState([]);
   const [zoom, setZoom] = useState(1);
+  const [showButtons, setShowButtons] = useState(true);
   const navigate = useNavigate();
 
   // Timer για το κείμενο (15 δευτερόλεπτα)
@@ -36,6 +37,15 @@ function App() {
       return () => clearTimeout(hideTimer);
     }
   }, [showText]);
+
+  // Timer για απόκρυψη των κουμπιών ζουμ (10 δευτερόλεπτα μετά την εμφάνιση)
+  useEffect(() => {
+    const buttonsTimer = setTimeout(() => {
+      setShowButtons(false);
+    }, 10000);
+
+    return () => clearTimeout(buttonsTimer);
+  }, []);
 
   // Ανακατεύθυνση αν δεν υπάρχει έργο τέχνης
   useEffect(() => {
@@ -94,9 +104,13 @@ function App() {
       {!hideText && <MemoizedArtworkInfo artwork={artwork} />}
       {showText && <FloatingText title={artwork.title} date={artwork.objectDate} />}
       {track && <TrackInfo track={track} />}
-      <button style={{ opacity: 0.5 }} onClick={zoomIn}>+</button>
-      <button style={{ opacity: 0.5 }} onClick={zoomOut}>-</button>
-      <button onClick={() => addToFavorites(artwork)}>Add to Favorites</button>
+      {showButtons && (
+        <div className="zoom-buttons">
+          <button className="zoom-button" onClick={zoomIn}>+</button>
+          <button className="zoom-button" onClick={zoomOut}>-</button>
+        </div>
+      )}
+      <button className="favorite-button" onClick={() => addToFavorites(artwork)}>❤️</button>
     </div>
   );
 }
