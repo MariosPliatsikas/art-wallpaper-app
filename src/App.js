@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import useArtwork from './useArtwork';  // Εισαγωγή ως default export
 import ArtworkInfo from './ArtworkInfo';
@@ -17,6 +16,7 @@ function App() {
   const [track, setTrack] = useState(null);
   const [favorites, setFavorites] = useState([]);
   const [showFavorites, setShowFavorites] = useState(false); // Κατάσταση για την εμφάνιση της λίστας αγαπημένων
+  const [selectedArtwork, setSelectedArtwork] = useState(null); // Κατάσταση για το επιλεγμένο έργο τέχνης
   const navigate = useNavigate();
 
   // Timer για το κείμενο (15 δευτερόλεπτα)
@@ -83,7 +83,14 @@ function App() {
     }
   };
 
-  if (!artwork) {
+  const handleSelectFavorite = (item) => {
+    setSelectedArtwork(item);
+    setShowFavorites(false); // Απόκρυψη της λίστας αγαπημένων
+  };
+
+  const artworkToShow = selectedArtwork || artwork;
+
+  if (!artworkToShow) {
     return <div>Loading...</div>;
   }
 
@@ -91,18 +98,18 @@ function App() {
     <div
       className="App"
       style={{
-        backgroundImage: `url(${artwork.primaryImage})`,
+        backgroundImage: `url(${artworkToShow.primaryImage})`,
         backgroundPosition: 'center',
         backgroundSize: 'contain',
       }}
       onClick={handleTextClick}
     >
-      {!hideText && <MemoizedArtworkInfo artwork={artwork} />}
-      {showText && <FloatingText title={artwork.title} date={artwork.objectDate} />}
+      {!hideText && <MemoizedArtworkInfo artwork={artworkToShow} />}
+      {showText && <FloatingText title={artworkToShow.title} date={artworkToShow.objectDate} />}
       {track && <TrackInfo track={track} />}
-      <button className="favorite-button" onClick={() => addToFavorites(artwork)}>❤️</button>
+      <button className="favorite-button" onClick={() => addToFavorites(artworkToShow)}>❤️</button>
       <button className="show-favorites-button" onClick={toggleFavorites}>Show Favorites</button>
-      {showFavorites && <FavoritesList favorites={favorites} />}
+      {showFavorites && <FavoritesList favorites={favorites} onSelectFavorite={handleSelectFavorite} />}
     </div>
   );
 }
