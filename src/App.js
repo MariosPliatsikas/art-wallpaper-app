@@ -7,7 +7,7 @@ import FavoritesList from './FavoritesList'; // Προσθήκη του componen
 import './App.css';
 import { useNavigate } from 'react-router-dom';
 import config from './config';
-import { saveFavorite, getFavorites } from './database'; // Προσθήκη της λειτουργίας αποθήκευσης
+import { saveFavorite, getFavorites, clearFavorites } from './database'; // Προσθήκη της λειτουργίας εκκαθάρισης
 
 function App() {
   const artwork = useArtwork();
@@ -88,6 +88,11 @@ function App() {
     setShowFavorites(false); // Απόκρυψη της λίστας αγαπημένων
   };
 
+  const handleClearFavorites = () => {
+    clearFavorites();
+    setFavorites([]);
+  };
+
   const artworkToShow = selectedArtwork || artwork;
 
   if (!artworkToShow) {
@@ -109,7 +114,7 @@ function App() {
       {track && <TrackInfo track={track} />}
       <button className="favorite-button" onClick={() => addToFavorites(artworkToShow)}>❤️</button>
       <button className="show-favorites-button" onClick={toggleFavorites}>Show Favorites</button>
-      {showFavorites && <FavoritesList favorites={favorites} onSelectFavorite={handleSelectFavorite} />}
+      {showFavorites && <FavoritesList favorites={favorites} onSelectFavorite={handleSelectFavorite} onClearFavorites={handleClearFavorites} />}
     </div>
   );
 }
