@@ -163,3 +163,46 @@
   cursor: pointer;
   transition: opacity 0.3s ease;
 }
+
+.show-favorites-button {
+  position: absolute;
+  top: 10px;
+  right: 60px;
+  background: rgba(255, 255, 255, 0.3); /* Increased transparency */
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+  font-size: 1rem;
+  color: white;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.favorites-list {
+  position: absolute;
+  top: 50px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 10px;
+  border-radius: 5px;
+  max-width: 300px;
+  color: white;
+}
+
+.favorites-list ul {
+  list-style: none;
+  padding: 0;
+}
+
+.favorites-list li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.favorites-list img {
+  width: 50px;
+  height: 50px;
+  margin-right: 10px;
+  border-radius: 5px;
+}
