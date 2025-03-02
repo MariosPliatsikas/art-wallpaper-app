@@ -209,3 +209,15 @@
   margin-right: 10px;
   border-radius: 5px;
 }
+
+.clear-favorites-button {
+  background: rgba(255, 0, 0, 0.5); /* Κόκκινο κουμπί με διαφάνεια */
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  font-size: 1rem;
+  color: white;
+  cursor: pointer;
+  margin-bottom: 10px;
+  transition: opacity 0.3s ease;
+}
