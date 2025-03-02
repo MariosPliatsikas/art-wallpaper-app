@@ -186,6 +186,8 @@
   padding: 10px;
   border-radius: 5px;
   max-width: 300px;
+  max-height: 400px; /* Περιορισμός ύψους για να εμφανίζεται το scroll bar */
+  overflow-y: auto; /* Προσθήκη scroll bar */
   color: white;
 }
 
