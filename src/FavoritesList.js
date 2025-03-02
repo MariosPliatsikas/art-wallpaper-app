@@ -1,5 +1,4 @@
-
-iimport React from 'react';
+import React from 'react';
 
 const FavoritesList = ({ favorites, onSelectFavorite, onClearFavorites }) => {
   return (
