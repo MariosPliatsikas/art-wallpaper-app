@@ -1,25 +1,25 @@
+
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import useArtwork from './useArtwork';  // Εισαγωγή ως default export
+import useArtwork from './useArtwork'; 
 import ArtworkInfo from './ArtworkInfo';
 import FloatingText from './components/FloatingText/FloatingText';
 import TrackInfo from './components/TrackInfo/TrackInfo';
-import FavoritesList from './FavoritesList'; // Προσθήκη του component
-import './App.css';
+import FavoritesList from './FavoritesList';
 import { useNavigate } from 'react-router-dom';
 import config from './config';
-import { saveFavorite, getFavorites, clearFavorites } from './database'; // Προσθήκη της λειτουργίας εκκαθάρισης
+import { saveFavorite, getFavorites, clearFavorites } from './database'; 
+import './App.css';
 
 function App() {
   const artwork = useArtwork();
   const [hideText] = useState(false);
-  const [showText, setShowText] = useState(false); // Αρχικά false, θα εμφανιστεί μετά από 15 δευτερόλεπτα
+  const [showText, setShowText] = useState(false);
   const [track, setTrack] = useState(null);
   const [favorites, setFavorites] = useState([]);
-  const [showFavorites, setShowFavorites] = useState(false); // Κατάσταση για την εμφάνιση της λίστας αγαπημένων
-  const [selectedArtwork, setSelectedArtwork] = useState(null); // Κατάσταση για το επιλεγμένο έργο τέχνης
+  const [showFavorites, setShowFavorites] = useState(false);
+  const [selectedArtwork, setSelectedArtwork] = useState(null);
   const navigate = useNavigate();
 
-  // Timer για το κείμενο (15 δευτερόλεπτα)
   useEffect(() => {
     const textTimer = setTimeout(() => {
       setShowText(true);
@@ -28,7 +28,6 @@ function App() {
     return () => clearTimeout(textTimer);
   }, []);
 
-  // Timer για απόκρυψη του κειμένου (10 δευτερόλεπτα μετά την εμφάνιση)
   useEffect(() => {
     if (showText) {
       const hideTimer = setTimeout(() => {
@@ -39,14 +38,12 @@ function App() {
     }
   }, [showText]);
 
-  // Ανακατεύθυνση αν δεν υπάρχει έργο τέχνης
   useEffect(() => {
     if (!artwork) {
       navigate('/next-page');
     }
   }, [artwork, navigate]);
 
-  // Αναζήτηση τραγουδιού από το ListenBrainz
   useEffect(() => {
     fetch('https://api.listenbrainz.org/1/stats/user/MariosPliatsikas/play-count', {
       headers: {
@@ -68,24 +65,24 @@ function App() {
   const MemoizedArtworkInfo = useMemo(() => React.memo(ArtworkInfo), []);
 
   const handleTextClick = useCallback(() => {
-    setShowText(true); // Εμφάνιση κειμένου όταν ο χρήστης κάνει κλικ
+    setShowText(true);
   }, []);
 
   const addToFavorites = (item) => {
     setFavorites([...favorites, item]);
-    saveFavorite(item); // Αποθήκευση του αγαπημένου στη βάση δεδομένων
+    saveFavorite(item);
   };
 
   const toggleFavorites = () => {
     setShowFavorites(!showFavorites);
     if (!showFavorites) {
-      setFavorites(getFavorites()); // Ανάκτηση των αγαπημένων από τη βάση δεδομένων
+      setFavorites(getFavorites());
     }
   };
 
   const handleSelectFavorite = (item) => {
     setSelectedArtwork(item);
-    setShowFavorites(false); // Απόκρυψη της λίστας αγαπημένων
+    setShowFavorites(false);
   };
 
   const handleClearFavorites = () => {
@@ -114,6 +111,7 @@ function App() {
       {track && <TrackInfo track={track} />}
       <button className="favorite-button" onClick={() => addToFavorites(artworkToShow)}>❤️</button>
       <button className="show-favorites-button" onClick={toggleFavorites}>Show Favorites</button>
+      <button className="museum-button" onClick={() => navigate('/rijksmuseum')}>🔍 Explore Rijksmuseum</button>
       {showFavorites && <FavoritesList favorites={favorites} onSelectFavorite={handleSelectFavorite} onClearFavorites={handleClearFavorites} />}
     </div>
   );
