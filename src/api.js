@@ -1,9 +1,10 @@
+
+const RIJKSMUSEUM_API_KEY = 'https://data.rijksmuseum.nl/oai';
+
 export async function fetchArtwork(query = 'painting') {
   try {
-    // Βήμα 1: Αναζήτηση για έργα τέχνης
     const searchResponse = await fetch(
-      
-`https://collectionapi.metmuseum.org/public/collection/v1/search?hasImages=true&q=${query}`
+      `https://collectionapi.metmuseum.org/public/collection/v1/search?hasImages=true&q=${query}`
     );
 
     if (!searchResponse.ok) {
@@ -12,16 +13,13 @@ export async function fetchArtwork(query = 'painting') {
 
     const searchData = await searchResponse.json();
 
-    // Έλεγχος αν υπάρχουν διαθέσιμα έργα τέχνης
     if (!searchData.objectIDs || searchData.objectIDs.length === 0) {
       throw new Error('No artworks found');
     }
 
-    // Επιλογή τυχαίου έργου τέχνης
     const randomIndex = Math.floor(Math.random() * searchData.objectIDs.length);
     const artworkID = searchData.objectIDs[randomIndex];
 
-    // Βήμα 2: Ανάκτηση λεπτομερειών για το συγκεκριμένο έργο τέχνης
     const artworkResponse = await fetch(
       `https://collectionapi.metmuseum.org/public/collection/v1/objects/${artworkID}`
     );
@@ -32,7 +30,6 @@ export async function fetchArtwork(query = 'painting') {
 
     const artwork = await artworkResponse.json();
 
-    // Έλεγχος αν το έργο έχει εικόνα
     if (!artwork.primaryImage || artwork.primaryImage === '') {
       throw new Error('Artwork has no image');
     }
@@ -40,6 +37,37 @@ export async function fetchArtwork(query = 'painting') {
     return artwork;
   } catch (error) {
     console.error('Error fetching artwork:', error);
-    return null; // Επιστροφή null σε περίπτωση σφάλματος
+    return null;
+  }
+}
+
+export async function fetchRijksmuseumArtwork(query = 'painting') {
+  try {
+    const response = await fetch(
+      `https://www.rijksmuseum.nl/api/en/collection?key=${RIJKSMUSEUM_API_KEY}&format=json&q=${query}`
+    );
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch Rijksmuseum artwork list');
+    }
+
+    const data = await response.json();
+
+    if (!data.artObjects || data.artObjects.length === 0) {
+      throw new Error('No artworks found');
+    }
+
+    const randomIndex = Math.floor(Math.random() * data.artObjects.length);
+    const artwork = data.artObjects[randomIndex];
+
+    return {
+      title: artwork.title,
+      artist: artwork.principalOrFirstMaker,
+      image: artwork.webImage?.url || '',
+      link: artwork.links?.web || '',
+    };
+  } catch (error) {
+    console.error('Error fetching Rijksmuseum artwork:', error);
+    return null;
   }
 }
