@@ -1,7 +1,6 @@
-
 from flask import Blueprint, render_template, jsonify
 from .models import Artwork
-from sqlalchemy.sql import func  # Προσθήκη αυτής της γραμμής
+from sqlalchemy.sql import func
 
 main = Blueprint('main', __name__)
 
