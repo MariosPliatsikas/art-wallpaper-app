@@ -4,27 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Art Wallpaper App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <!-- Προσθέστε το Google Fonts link για να χρησιμοποιήσετε μια όμορφη γραμματοσειρά -->
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
 </head>
 <body>
-    <h1>Welcome to Art Wallpaper App</h1>
-    <div id="artwork"></div>
-    <script>
-        fetch('/api/artwork')
-            .then(response => response.json())
-            .then(data => {
-                const artworkDiv = document.getElementById('artwork');
-                if (data.error) {
-                    artworkDiv.innerText = data.error;
-                } else {
-                    artworkDiv.innerHTML = `
-                        <h2>${data.title}</h2>
-                        <img src="${data.image_url}" alt="${data.title}">
-                        <p>${data.artist}</p>
-                        <p>${data.description}</p>
-                    `;
-                }
-            });
-    </script>
+    <div class="sidebar">
+        <p class="museum-name">Metropolitan Museum of Art</p>
+    </div>
+    <div class="content">
+        <h1>Welcome to Art Wallpaper App</h1>
+        <div id="artwork">
+            <h2>{{ artwork.title }}</h2>
+            <img src="{{ artwork.image_url }}" alt="{{ artwork.title }}">
+            <p>{{ artwork.artist }}</p>
+            <p>{{ artwork.description }}</p>
+        </div>
+    </div>
 </body>
 </html>
-
