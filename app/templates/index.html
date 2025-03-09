@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Art Wallpaper App</title>
+</head>
+<body>
+    <h1>Welcome to Art Wallpaper App</h1>
+    <div id="artwork"></div>
+    <script>
+        fetch('/api/artwork')
+            .then(response => response.json())
+            .then(data => {
+                const artworkDiv = document.getElementById('artwork');
+                if (data.error) {
+                    artworkDiv.innerText = data.error;
+                } else {
+                    artworkDiv.innerHTML = `
+                        <h2>${data.title}</h2>
+                        <img src="${data.image_url}" alt="${data.title}">
+                        <p>${data.artist}</p>
+                        <p>${data.description}</p>
+                    `;
+                }
+            });
+    </script>
+</body>
+</html>
