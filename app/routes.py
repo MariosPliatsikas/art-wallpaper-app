@@ -6,7 +6,8 @@ main = Blueprint('main', __name__)
 
 @main.route('/')
 def index():
-    return render_template('index.html')
+    artwork = Artwork.query.order_by(func.random()).first()
+    return render_template('index.html', artwork=artwork)
 
 @main.route('/api/artwork')
 def get_artwork():
