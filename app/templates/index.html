@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Art Wallpaper App</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <!-- Προσθέστε το Google Fonts link για να χρησιμοποιήσετε μια όμορφη γραμματοσειρά -->
+    <!-- Add the Google Fonts link to use a beautiful font -->
     <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -20,6 +20,14 @@
             <p>{{ artwork.artist }}</p>
             <p>{{ artwork.description }}</p>
         </div>
+        <!-- Refresh Button -->
+        <button id="refreshButton">Refresh Page</button>
     </div>
+    <script>
+        // Add event listener to the refresh button to reload the page
+        document.getElementById('refreshButton').addEventListener('click', function() {
+            location.reload();
+        });
+    </script>
 </body>
 </html>
