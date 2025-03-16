@@ -6,7 +6,12 @@ main = Blueprint('main', __name__)
 
 @main.route('/')
 def index():
-    return render_template('index.html')
+    artwork = {
+        'title': 'Starry Night',
+        'artist': 'Vincent van Gogh',
+        'year': 1889
+    }
+    return render_template('index.html', artwork=artwork)  # Ensure artwork is passed here
 
 @main.route('/api/artwork')
 def get_artwork():
@@ -20,3 +25,7 @@ def get_artwork():
         })
     else:
         return jsonify({'error': 'No artwork found'}), 404
+
+@main.route('/about')
+def about():
+    return render_template('about.html')
