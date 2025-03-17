@@ -6,6 +6,7 @@
 /node_modules
 /.pnp
 .pnp.js
+node_modules/
 
 # ================================
 # Testing
@@ -19,6 +20,7 @@
 /build
 /dist
 /.cache
+build/
 
 # ================================
 # Environment variables
@@ -60,6 +62,8 @@ src/ThreeScene.js
 src/ai.js
 webpack.config.js
 
-
 __pycache__/
 *.pyc
+venv/
+public/
+src/

@@ -1,4 +1,3 @@
-
 # Art Wallpaper App
 
 ![Art Wallpaper App Screenshot](./public/screenshot.png) <!-- Add image -->
@@ -19,10 +18,16 @@ The **Art Wallpaper App** changes your device's wallpaper with art pieces from v
 - **Metropolitan Museum of Art API**: For retrieving art pieces.
 - **MusicBrainz API**: For playing music.
 - **CSS**: For the style and aesthetics of the app.
+- **Flask**: Python web framework for the backend.
+- **Flask-SQLAlchemy**: For database management.
+- **Flask-Caching**: For caching API responses.
+- **Harvard Art Museums API**: For retrieving art pieces.
 
 ## 📦 Installation
 
-Follow the steps below to run the app locally:
+### React Application
+
+Follow the steps below to run the React app locally:
 
 1. Clone the repository:
    ```bash
