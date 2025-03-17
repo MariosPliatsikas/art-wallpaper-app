@@ -10,7 +10,16 @@ main = Blueprint('main', __name__)
 
 @main.route('/')
 def index():
-    return render_template('index.html')
+    artwork = Artwork.query.order_by(func.random()).first()
+    if artwork:
+        return render_template('index.html', artwork=artwork)
+    else:
+        return render_template('index.html', artwork={
+            'title': 'No Artwork Found',
+            'image_url': '',
+            'artist': '',
+            'description': ''
+        })
 
 @main.route('/api/artwork')
 def get_artwork():
