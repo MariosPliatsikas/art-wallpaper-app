@@ -59,3 +59,7 @@ Thumbs.db
 src/ThreeScene.js
 src/ai.js
 webpack.config.js
+
+
+__pycache__/
+*.pyc
