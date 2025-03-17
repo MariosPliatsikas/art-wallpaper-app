@@ -1,24 +1,43 @@
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: 'Lobster', cursive;
     display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
     margin: 0;
-    padding: 0;
+    background-color: #f0f0f0;
 }
 
 .sidebar {
-    width: 250px;
-    background-color: #f8f9fa;
+    position: absolute;
+    top: 0;
+    left: 0;
     padding: 20px;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    background-color: #333;
+    color: #fff;
 }
 
 .museum-name {
     font-family: 'Lobster', cursive;
     font-size: 24px;
-    color: #333;
+    color: #fff;
 }
 
 .content {
-    flex: 1;
-    padding: 20px;
+    text-align: center;
+}
+
+#artwork img {
+    max-width: 100%;
+    max-height: 80vh;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
 }

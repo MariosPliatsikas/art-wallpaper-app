@@ -10,13 +10,13 @@
 </head>
 <body>
     <div class="sidebar">
-        <p class="museum-name">Metropolitan Museum of Art</p>
+        <p class="museum-name">Museum of Art</p>
     </div>
     <div class="content">
         <h1>Welcome to Art Wallpaper App</h1>
         <div id="artwork">
             <h2>{{ artwork.title }}</h2>
-            <img src="{{ artwork.image_url }}" alt="{{ artwork.title }}">
+            <img src="{{ artwork.image_url }}" alt="{{ artwork.title }}" onerror="this.onerror=null;this.src='https://via.placeholder.com/150';">
             <p>{{ artwork.artist }}</p>
             <p>{{ artwork.description }}</p>
         </div>
@@ -28,6 +28,23 @@
         document.getElementById('refreshButton').addEventListener('click', function() {
             location.reload();
         });
+
+        // Automatically refresh the page every 5 minutes (300000 milliseconds)
+        setInterval(function() {
+            location.reload();
+        }, 300000); // 300000 milliseconds = 5 minutes
+
+        // Check if the image is loaded before displaying the page
+        const img = document.querySelector('#artwork img');
+        img.onload = () => {
+            document.body.style.visibility = 'visible';
+        };
+        img.onerror = () => {
+            document.body.style.visibility = 'visible';
+        };
+
+        // Hide the body initially
+        document.body.style.visibility = 'hidden';
     </script>
 </body>
 </html>

@@ -1,20 +1,24 @@
-
 from flask import Blueprint, render_template, jsonify
 from .models import Artwork
 from sqlalchemy.sql import func
 import requests
 import os
+import random
 
 main = Blueprint('main', __name__)
 
 @main.route('/')
 def index():
-    artwork = {
-        'title': 'Starry Night',
-        'artist': 'Vincent van Gogh',
-        'year': 1889
-    }
-    return render_template('index.html', artwork=artwork)
+    artwork = Artwork.query.order_by(func.random()).first()
+    if artwork:
+        return render_template('index.html', artwork=artwork)
+    else:
+        return render_template('index.html', artwork={
+            'title': 'No Artwork Found',
+            'image_url': '',
+            'artist': '',
+            'description': ''
+        })
 
 @main.route('/api/artwork')
 def get_artwork():
@@ -32,10 +36,38 @@ def get_artwork():
 @main.route('/api/harvard')
 def get_harvard_artwork():
     api_key = os.getenv('HARVARD_API_KEY')
-    url = f'https://api.harvardartmuseums.org/object?apikey={api_key}&size=10'
+    url = f'https://api.harvardartmuseums.org/object?apikey={api_key}&size=100'
     response = requests.get(url)
     if response.status_code == 200:
         data = response.json()
+        print("Data from Harvard API:", data)  # Log the data
         return jsonify(data)
     else:
+        print("Failed to fetch data from Harvard API:", response.status_code, response.text)  # Log the error
         return jsonify({'error': 'Failed to fetch data from Harvard Art Museums API'}), response.status_code
+
+@main.route('/harvard')
+def harvard():
+    api_key = os.getenv('HARVARD_API_KEY')
+    url = f'https://api.harvardartmuseums.org/object?apikey={api_key}&size=100'
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        artworks = data['records']
+        artwork = random.choice(artworks)  # Επιλογή τυχαίου έργου τέχνης
+        image_url = artwork.get('primaryimageurl', '')
+        if not image_url:
+            image_url = 'https://via.placeholder.com/150'  # Placeholder image if no image URL is available
+        return render_template('index.html', artwork={
+            'title': artwork['title'],
+            'image_url': image_url,
+            'artist': artwork['people'][0]['name'] if 'people' in artwork and artwork['people'] else 'Unknown',
+            'description': artwork.get('description', 'No description available')
+        })
+    else:
+        return render_template('index.html', artwork={
+            'title': 'Failed to fetch data from Harvard Art Museums API',
+            'image_url': '',
+            'artist': '',
+            'description': ''
+        })
