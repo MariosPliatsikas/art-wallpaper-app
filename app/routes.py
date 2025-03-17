@@ -1,3 +1,4 @@
+
 from flask import Blueprint, render_template, jsonify
 from .models import Artwork
 from sqlalchemy.sql import func
