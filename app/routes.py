@@ -4,6 +4,7 @@ from sqlalchemy.sql import func
 import requests
 import os
 import random
+from . import cache
 
 main = Blueprint('main', __name__)
 
@@ -33,27 +34,29 @@ def get_artwork():
     else:
         return jsonify({'error': 'No artwork found'}), 404
 
-@main.route('/api/harvard')
-def get_harvard_artwork():
+@cache.cached(timeout=86400, key_prefix='harvard_artworks')
+def fetch_harvard_artworks():
     api_key = os.getenv('HARVARD_API_KEY')
     url = f'https://api.harvardartmuseums.org/object?apikey={api_key}&size=100'
     response = requests.get(url)
     if response.status_code == 200:
         data = response.json()
-        print("Data from Harvard API:", data)  # Log the data
-        return jsonify(data)
+        return data['records']
     else:
-        print("Failed to fetch data from Harvard API:", response.status_code, response.text)  # Log the error
-        return jsonify({'error': 'Failed to fetch data from Harvard Art Museums API'}), response.status_code
+        return []
+
+@main.route('/api/harvard')
+def get_harvard_artwork():
+    artworks = fetch_harvard_artworks()
+    if artworks:
+        return jsonify(artworks)
+    else:
+        return jsonify({'error': 'Failed to fetch data from Harvard Art Museums API'}), 500
 
 @main.route('/harvard')
 def harvard():
-    api_key = os.getenv('HARVARD_API_KEY')
-    url = f'https://api.harvardartmuseums.org/object?apikey={api_key}&size=100'
-    response = requests.get(url)
-    if response.status_code == 200:
-        data = response.json()
-        artworks = data['records']
+    artworks = fetch_harvard_artworks()
+    if artworks:
         artwork = random.choice(artworks)  # Επιλογή τυχαίου έργου τέχνης
         image_url = artwork.get('primaryimageurl', '')
         if not image_url:
