@@ -1,14 +1,14 @@
 const config = {
-  // API Token για το MusicBrainz
+  // API Token for ListenBrainz
   MUSIC_API_TOKEN: process.env.REACT_APP_MUSIC_API_TOKEN || 
-'HkAXEcoNEeBpMW5LENsV1oMqZuI9aSv1y3HJfyF9',
+    '71bdc45f-1445-4a1c-b1e7-8f15beec9be9',
 
-  // URLs για APIs
+  // Base URLs for APIs
   MET_MUSEUM_API_URL: 'https://collectionapi.metmuseum.org/public/collection/v1',
   MUSICBRAINZ_API_URL: 'https://api.listenbrainz.org/1',
 
-  // Άλλες ρυθμίσεις
-  DEFAULT_QUERY: 'painting', // Προεπιλεγμένο query για το Met Museum API
+  // Other settings
+  DEFAULT_QUERY: 'painting', // Default query for the Met Museum API
 };
 
 export default config;

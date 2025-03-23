@@ -1,4 +1,3 @@
-
 .App {
   position: relative;
   width: 100%;
@@ -136,38 +135,39 @@
   bottom: 10px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.7);
   padding: 10px;
   border-radius: 5px;
-  font-size: 1rem;
   color: white;
-  opacity: 0;
-  transition: opacity 1s ease-in-out;
+  text-align: center;
+  font-size: 1rem;
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+  visibility: visible;
+}
+.track-info a {
+  color: #1db954;
+  text-decoration: none;
+}
+.track-info a:hover {
+  text-decoration: underline;
 }
 
 .track-info.visible {
   opacity: 1;
 }
 
-.favorite-button {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: rgba(255, 255, 255, 0.3); /* Increased transparency */
-  border: none;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  font-size: 1.5rem;
-  color: red;
-  cursor: pointer;
-  transition: opacity 0.3s ease;
+.track-info.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
+/* Favorites buttons */
+.favorite-button,
 .show-favorites-button {
   position: absolute;
   top: 10px;
-  right: 60px;
   background: rgba(255, 255, 255, 0.3); /* Increased transparency */
   border: none;
   border-radius: 5px;
@@ -176,8 +176,27 @@
   color: white;
   cursor: pointer;
   transition: opacity 0.3s ease;
+  opacity: 1; /* Initially visible */
+  pointer-events: auto;
 }
 
+.favorite-button {
+  right: 10px;
+}
+
+.show-favorites-button {
+  right: 60px;
+}
+
+/* Hidden state for buttons */
+.hidden-buttons .favorite-button,
+.hidden-buttons .show-favorites-button {
+  opacity: 0; /* Hide buttons */
+  pointer-events: none; /* Disable interaction */
+  transition: opacity 0.5s ease;
+}
+
+/* Favorites list */
 .favorites-list {
   position: absolute;
   top: 50px;
@@ -220,4 +239,10 @@
   cursor: pointer;
   margin-bottom: 10px;
   transition: opacity 0.3s ease;
+}
+
+.audio-player {
+  margin-top: 10px;
+  width: 100%;
+  max-width: 300px;
 }
