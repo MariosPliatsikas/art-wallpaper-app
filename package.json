@@ -3,7 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "description": "An app that changes your wallpaper to random artworks from museums and plays music from MusicBrainz.",
-  "keywords": ["art", "wallpaper", "music", "react", "three.js"],
+  "keywords": [
+    "art",
+    "wallpaper",
+    "music",
+    "react",
+    "three.js"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/MariosPliatsikas/art-wallpaper-app.git"
@@ -18,9 +24,9 @@
     "@react-three/fiber": "^8.17.14",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "react-router-dom": "^7.1.5",
+    "react-router-dom": "^7.4.0",
     "react-scripts": "^5.0.1",
-    "soundcloud": "^3.3.2",
+    "soundcloud": "^0.2.0",
     "three": "^0.173.0"
   },
   "scripts": {
