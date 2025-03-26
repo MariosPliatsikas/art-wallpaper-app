@@ -59,7 +59,7 @@ function App() {
         return response.json();
       })
       .then((data) => {
-        console.log('Listens:', data);
+        // console.log('Listens:', data);
         if (data.payload && data.payload.listens && data.payload.listens.length > 0) {
           setTrack(data.payload.listens[0].track_metadata); // Set the first track
         } else {
@@ -74,7 +74,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    console.log('Track state:', track);
+    // console.log('Track state:', track);
   }, [track]);
 
   const MemoizedArtworkInfo = useMemo(() => React.memo(ArtworkInfo), []);
