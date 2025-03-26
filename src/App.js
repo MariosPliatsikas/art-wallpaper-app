@@ -7,8 +7,6 @@ import './App.css';
 import { useNavigate } from 'react-router-dom';
 import config from './config';
 import { saveFavorite, getFavorites, clearFavorites } from './database'; // Adding clearFavorites functionality
-// eslint-disable-next-line no-unused-vars
-import TrackInfo from './components/TrackInfo/TrackInfo';
 
 function App() {
   const artwork = useArtwork();
@@ -18,7 +16,6 @@ function App() {
   const [favorites, setFavorites] = useState([]);
   const [showFavorites, setShowFavorites] = useState(false); // State for showing the favorites list
   const [selectedArtwork, setSelectedArtwork] = useState(null); // State for the selected artwork
-  const [showTrackInfo, setShowTrackInfo] = useState(true);
   const navigate = useNavigate();
 
   // Timer to show text (15 seconds)
@@ -138,34 +135,6 @@ function App() {
     };
   }, []);
 
-  useEffect(() => {
-    let hideTimeout;
-
-    const showTrackInfoHandler = () => {
-      // Εμφάνιση του track-info μόνο αν είναι κρυφό
-      if (!showTrackInfo) {
-        setShowTrackInfo(true);
-      }
-
-      // Επανεκκίνηση του χρονόμετρου για να κρυφτεί μετά από 5 δευτερόλεπτα
-      clearTimeout(hideTimeout);
-      hideTimeout = setTimeout(() => {
-        setShowTrackInfo(false);
-      }, 5000);
-    };
-
-    // Προσθήκη event listeners για κίνηση κέρσορα και αφή
-    window.addEventListener('mousemove', showTrackInfoHandler);
-    window.addEventListener('touchstart', showTrackInfoHandler);
-
-    return () => {
-      // Καθαρισμός του χρονόμετρου και των event listeners
-      clearTimeout(hideTimeout);
-      window.removeEventListener('mousemove', showTrackInfoHandler);
-      window.removeEventListener('touchstart', showTrackInfoHandler);
-    };
-  }, [showTrackInfo]);
-
   if (!artworkToShow) {
     return <div>Loading...</div>;
   }
@@ -182,21 +151,6 @@ function App() {
     >
       {!hideText && <MemoizedArtworkInfo artwork={artworkToShow} />}
       {showText && <FloatingText title={artworkToShow.title} date={artworkToShow.objectDate} />}
-      {showTrackInfo && track ? (
-        <div className="track-info">
-          <h3>Now Playing:</h3>
-          <p><strong>Track:</strong> {track.track_name || 'Unknown Track'}</p>
-          <p><strong>Artist:</strong> {track.artist_name || 'Unknown Artist'}</p>
-          <p><strong>Source:</strong> {track.additional_info?.music_service_name || 'Unknown Source'}</p>
-          <a href={track.additional_info?.origin_url} target="_blank" rel="noopener noreferrer">
-            Listen Here
-          </a>
-        </div>
-      ) : showTrackInfo && (
-        <div className="track-info">
-          No music data available.
-        </div>
-      )}
       <button className="favorite-button" onClick={() => addToFavorites(artworkToShow)}>❤️</button>
       <button className="show-favorites-button" onClick={toggleFavorites}>Show Favorites</button>
       {showFavorites && (
