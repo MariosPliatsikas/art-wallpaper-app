@@ -199,7 +199,7 @@ function App() {
           onClearFavorites={handleClearFavorites}
         />
       )}
-      <RefreshButton hidden={hideButtons} />
+      <RefreshButton className="refresh-button" hidden={hideButtons} />
     </div>
   );
 }

@@ -265,3 +265,22 @@ button.hidden {
 button.visible {
   opacity: 1; /* Κάνει το κουμπί ορατό */
 }
+
+.refresh-button {
+  position: absolute; /* Τοποθέτηση σε απόλυτη θέση */
+  bottom: 20px; /* Απόσταση από το κάτω μέρος */
+  right: 20px; /* Απόσταση από τη δεξιά πλευρά */
+  padding: 20px 25px; /* Μεγαλύτερο padding για μεγαλύτερο κουμπί */
+  font-size: 18px; /* Μεγαλύτερο μέγεθος γραμματοσειράς */
+  background-color: rgba(255, 255, 255, 0.5); /* Λευκό με 30% διαφάνεια */
+  border: 2px solid rgba(255, 255, 255, 0.5); /* Διαφανές περίγραμμα */
+  border-radius: 12px; /* Στρογγυλεμένες γωνίες */
+  cursor: pointer; /* Δείκτης χεριού για κλικ */
+  transition: all 0.3s ease-in-out; /* Ομαλή μετάβαση για hover */
+  color: #000; /* Μαύρο χρώμα κειμένου */
+}
+
+.refresh-button:hover {
+  background-color: rgba(255, 255, 255, 0.6); /* Λιγότερο διαφανές όταν γίνεται hover */
+  transform: scale(1.1); /* Ελαφρώς μεγαλύτερο μέγεθος όταν γίνεται hover */
+}
