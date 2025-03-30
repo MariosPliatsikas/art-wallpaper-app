@@ -1,9 +1,8 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client'; // Σωστή εισαγωγή
 import { BrowserRouter as Router } from 'react-router-dom';
 import App from './App';
 import './index.css';
-import { createRoot } from 'react-dom/client'; // Σωστή εισαγωγή
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component {
@@ -31,28 +30,14 @@ class ErrorBoundary extends React.Component {
 
 // Χρήση createRoot για React 18+
 const rootElement = document.getElementById('root');
+const root = createRoot(rootElement); // Χρήση της σωστής μεθόδου
 
-if (ReactDOM.createRoot) {
-  const root = ReactDOM.createRoot(rootElement);
-  root.render(
-    <React.StrictMode>
-      <Router>
-        <ErrorBoundary>
-          <App />
-        </ErrorBoundary>
-      </Router>
-    </React.StrictMode>
-  );
-} else {
-  // Fallback για παλαιότερες εκδόσεις του React
-  ReactDOM.render(
-    <React.StrictMode>
-      <Router>
-        <ErrorBoundary>
-          <App />
-        </ErrorBoundary>
-      </Router>
-    </React.StrictMode>,
-    rootElement
-  );
-}
+root.render(
+  <React.StrictMode>
+    <Router>
+      <ErrorBoundary>
+        <App />
+      </ErrorBoundary>
+    </Router>
+  </React.StrictMode>
+);

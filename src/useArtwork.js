@@ -1,18 +1,26 @@
 import { useEffect, useState } from 'react';
 import { fetchArtwork } from './api';
 
+const defaultArtwork = {
+  image: '/path/to/default-image.png', // Βεβαιωθείτε ότι η διαδρομή είναι σωστή
+  title: 'Default Artwork',
+};
+
 // Δημιουργία του custom hook
 const useArtwork = () => {
   const [artwork, setArtwork] = useState(null);
 
   useEffect(() => {
     const getArtwork = async () => {
-      const data = await fetchArtwork('painting'); // Μπορείς να αλλάξεις το query 
+      const fetchedArtwork = await fetchArtwork('painting'); // Μπορείς να αλλάξεις το query 
 
-      if (data) {
-        setArtwork(data);
+      const artwork = fetchedArtwork || defaultArtwork;
+
+      if (artwork) {
+        setArtwork(artwork);
       } else {
-        console.log('No artwork found or an error occurred.');
+        console.error("No artwork found or an error occurred.");
+        setArtwork(defaultArtwork); // Προεπιλεγμένο έργο τέχνης
       }
     };
 

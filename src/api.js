@@ -30,12 +30,19 @@ export async function fetchArtwork(query = 'painting') {
       throw new Error('Failed to fetch artwork details');
     }
 
-    const artwork = await artworkResponse.json();
+    const fetchedArtwork = await artworkResponse.json();
 
     // Έλεγχος αν το έργο έχει εικόνα
-    if (!artwork.primaryImage || artwork.primaryImage === '') {
+    if (!fetchedArtwork.primaryImage || fetchedArtwork.primaryImage === '') {
       throw new Error('Artwork has no image');
     }
+
+    const defaultArtwork = {
+      image: '/path/to/default-image.png',
+      title: 'Default Artwork',
+    };
+
+    const artwork = fetchedArtwork || defaultArtwork;
 
     return artwork;
   } catch (error) {
