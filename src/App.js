@@ -18,6 +18,7 @@ function App() {
   const [showFavorites, setShowFavorites] = useState(false); // State for showing the favorites list
   const [selectedArtwork, setSelectedArtwork] = useState(null); // State for the selected artwork
   const [hideButtons, setHideButtons] = useState(false); // State for hiding buttons
+  const [showFallback, setShowFallback] = useState(false); // State for fallback display
   const navigate = useNavigate();
 
   // Timer to show text (15 seconds)
@@ -49,30 +50,30 @@ function App() {
 
   // Fetch track data from ListenBrainz
   useEffect(() => {
-    fetch('https://api.listenbrainz.org/1/user/MariosPls/listens', {
-      headers: {
-        'Authorization': `Bearer ${config.MUSIC_API_TOKEN}`,
-      },
-    })
-      .then((response) => {
+    const fetchTrackData = async () => {
+      try {
+        const response = await fetch('https://api.listenbrainz.org/1/user/MariosPls/listens', {
+          headers: {
+            'Authorization': `Bearer ${config.MUSIC_API_TOKEN}`,
+          },
+        });
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        return response.json();
-      })
-      .then((data) => {
-        // console.log('Listens:', data);
+        const data = await response.json();
         if (data.payload && data.payload.listens && data.payload.listens.length > 0) {
           setTrack(data.payload.listens[0].track_metadata); // Set the first track
         } else {
           console.warn('No listens found in the response');
           setTrack(null); // No track available
         }
-      })
-      .catch((error) => {
-        console.error('Error fetching listens:', error);
+      } catch (error) {
+        console.error("Σφάλμα κατά τη λήψη του έργου τέχνης:", error);
         setTrack(null); // Fallback: No track available
-      });
+      }
+    };
+
+    fetchTrackData();
   }, []);
 
   useEffect(() => {
@@ -137,8 +138,29 @@ function App() {
     };
   }, []);
 
-  if (!artworkToShow) {
-    return <div>Loading...</div>;
+  useEffect(() => {
+    if (!artworkToShow || !artworkToShow.primaryImage) {
+      const timer = setTimeout(() => {
+        setShowFallback(true);
+      }, 7000); // 7 δευτερόλεπτα
+
+      return () => clearTimeout(timer); // Καθαρισμός του timer όταν το component αποσυνδέεται
+    } else {
+      setShowFallback(false); // Επαναφορά αν υπάρχει artwork
+    }
+  }, [artworkToShow]);
+
+  if (!artworkToShow || !artworkToShow.primaryImage) {
+    if (!showFallback) {
+      return null; // Μην εμφανίζετε τίποτα πριν περάσουν τα 7 δευτερόλεπτα
+    }
+
+    return (
+      <div className="fallback">
+        <p>No artwork available. Please try refreshing the page.</p>
+        <RefreshButton />
+      </div>
+    );
   }
 
   return (

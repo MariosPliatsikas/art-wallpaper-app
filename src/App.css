@@ -213,3 +213,16 @@
   width: 100%;
   max-width: 300px;
 }
+
+.fallback {
+  font-family: 'Dancing Script', cursive; /* Καλλιτεχνική γραμματοσειρά */
+  font-size: 1.5rem; /* Μέγεθος γραμματοσειράς */
+  color: #555; /* Απαλό γκρι χρώμα */
+  text-align: center; /* Κεντραρισμένο κείμενο */
+  margin-top: 20%; /* Απόσταση από την κορυφή */
+}
+
+.fallback p {
+  margin: 0;
+  padding: 0;
+}
