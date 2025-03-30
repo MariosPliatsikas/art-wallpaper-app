@@ -114,24 +114,24 @@ function App() {
     let hideButtonsTimeout;
 
     const showButtons = () => {
-      setHideButtons(false);
-      clearTimeout(hideButtonsTimeout);
+      setHideButtons(false); // Εμφάνιση κουμπιών
+      clearTimeout(hideButtonsTimeout); // Καθαρισμός του προηγούμενου timeout
       hideButtonsTimeout = setTimeout(() => {
-        setHideButtons(true);
-      }, 5000); // Hide buttons after 5 seconds
+        setHideButtons(true); // Απόκρυψη κουμπιών μετά από 5 δευτερόλεπτα
+      }, 5000);
     };
 
-    // Add event listeners for mouse movement and touch
+    // Προσθήκη event listeners
     window.addEventListener('mousemove', showButtons);
     window.addEventListener('touchstart', showButtons);
 
-    // Start the initial timeout
+    // Αρχικό timeout για απόκρυψη
     hideButtonsTimeout = setTimeout(() => {
       setHideButtons(true);
     }, 5000);
 
     return () => {
-      // Cleanup event listeners and timeout
+      // Καθαρισμός event listeners και timeout
       window.removeEventListener('mousemove', showButtons);
       window.removeEventListener('touchstart', showButtons);
       clearTimeout(hideButtonsTimeout);
@@ -175,20 +175,23 @@ function App() {
     >
       {!hideText && <MemoizedArtworkInfo artwork={artworkToShow} />}
       {showText && <FloatingText title={artworkToShow.title} date={artworkToShow.objectDate} />}
-      <button
-        className="favorite-button"
-        style={{ display: hideButtons ? 'none' : 'block' }}
-        onClick={() => addToFavorites(artworkToShow)}
-      >
-        ❤️
-      </button>
-      <button
-        className="show-favorites-button"
-        style={{ display: hideButtons ? 'none' : 'block' }}
-        onClick={toggleFavorites}
-      >
-        Show Favorites
-      </button>
+      
+      {/* Κουμπιά σε σειρά */}
+      <div className="button-container">
+        <button
+          className={hideButtons ? 'hidden' : 'visible'}
+          onClick={() => addToFavorites(artworkToShow)}
+        >
+          ❤️ Favorite
+        </button>
+        <button
+          className={hideButtons ? 'hidden' : 'visible'}
+          onClick={toggleFavorites}
+        >
+          Show Favorites
+        </button>
+      </div>
+
       {showFavorites && (
         <FavoritesList
           favorites={favorites}

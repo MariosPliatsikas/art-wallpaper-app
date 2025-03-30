@@ -226,3 +226,42 @@
   margin: 0;
   padding: 0;
 }
+
+.hidden {
+  opacity: 0; /* Κάνει το στοιχείο αόρατο */
+  transition: opacity 1s ease-in-out; /* Μετάβαση 1 δευτερολέπτου */
+}
+
+.visible {
+  opacity: 1; /* Κάνει το στοιχείο ορατό */
+  transition: opacity 1s ease-in-out; /* Μετάβαση 1 δευτερολέπτου */
+}
+
+.button-container {
+  position: absolute; /* Τοποθέτηση σε απόλυτη θέση */
+  top: 10px; /* Απόσταση από την κορυφή */
+  right: 10px; /* Απόσταση από τη δεξιά πλευρά */
+  display: flex; /* Χρήση flexbox για στοίχιση */
+  gap: 10px; /* Απόσταση μεταξύ των κουμπιών */
+  z-index: 1000; /* Εξασφαλίζει ότι τα κουμπιά είναι πάνω από άλλα στοιχεία */
+}
+
+button.hidden,
+button.visible {
+  padding: 10px 15px;
+  font-size: 16px;
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: opacity 3s ease-in-out; /* Αύξηση της διάρκειας μετάβασης σε 3 δευτερόλεπτα */
+}
+
+button.hidden {
+  opacity: 0; /* Κάνει το κουμπί αόρατο */
+  pointer-events: none; /* Απενεργοποιεί τα κλικ όταν είναι κρυφό */
+}
+
+button.visible {
+  opacity: 1; /* Κάνει το κουμπί ορατό */
+}
