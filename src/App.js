@@ -3,6 +3,7 @@ import useArtwork from './useArtwork'; // Importing as default export
 import ArtworkInfo from './ArtworkInfo';
 import FloatingText from './components/FloatingText/FloatingText';
 import FavoritesList from './FavoritesList'; // Adding the FavoritesList component
+import RefreshButton from './components/RefreshButton'; // Importing the RefreshButton component
 import './App.css';
 import { useNavigate } from 'react-router-dom';
 import config from './config';
@@ -160,6 +161,7 @@ function App() {
           onClearFavorites={handleClearFavorites}
         />
       )}
+      <RefreshButton />
     </div>
   );
 }
