@@ -60,3 +60,9 @@ src/ThreeScene.js
 src/ai.js
 webpack.config.js
 src/.env
+
+# ================================
+# Python files
+# ================================
+__pycache__/
+migrations/
