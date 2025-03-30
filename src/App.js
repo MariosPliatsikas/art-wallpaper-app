@@ -17,6 +17,7 @@ function App() {
   const [favorites, setFavorites] = useState([]);
   const [showFavorites, setShowFavorites] = useState(false); // State for showing the favorites list
   const [selectedArtwork, setSelectedArtwork] = useState(null); // State for the selected artwork
+  const [hideButtons, setHideButtons] = useState(false); // State for hiding buttons
   const navigate = useNavigate();
 
   // Timer to show text (15 seconds)
@@ -112,10 +113,10 @@ function App() {
     let hideButtonsTimeout;
 
     const showButtons = () => {
-      document.body.classList.remove('hidden-buttons');
+      setHideButtons(false);
       clearTimeout(hideButtonsTimeout);
       hideButtonsTimeout = setTimeout(() => {
-        document.body.classList.add('hidden-buttons');
+        setHideButtons(true);
       }, 5000); // Hide buttons after 5 seconds
     };
 
@@ -125,7 +126,7 @@ function App() {
 
     // Start the initial timeout
     hideButtonsTimeout = setTimeout(() => {
-      document.body.classList.add('hidden-buttons');
+      setHideButtons(true);
     }, 5000);
 
     return () => {
@@ -152,8 +153,20 @@ function App() {
     >
       {!hideText && <MemoizedArtworkInfo artwork={artworkToShow} />}
       {showText && <FloatingText title={artworkToShow.title} date={artworkToShow.objectDate} />}
-      <button className="favorite-button" onClick={() => addToFavorites(artworkToShow)}>❤️</button>
-      <button className="show-favorites-button" onClick={toggleFavorites}>Show Favorites</button>
+      <button
+        className="favorite-button"
+        style={{ display: hideButtons ? 'none' : 'block' }}
+        onClick={() => addToFavorites(artworkToShow)}
+      >
+        ❤️
+      </button>
+      <button
+        className="show-favorites-button"
+        style={{ display: hideButtons ? 'none' : 'block' }}
+        onClick={toggleFavorites}
+      >
+        Show Favorites
+      </button>
       {showFavorites && (
         <FavoritesList
           favorites={favorites}
@@ -161,7 +174,7 @@ function App() {
           onClearFavorites={handleClearFavorites}
         />
       )}
-      <RefreshButton />
+      <RefreshButton hidden={hideButtons} />
     </div>
   );
 }
