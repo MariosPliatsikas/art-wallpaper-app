@@ -24,7 +24,7 @@ const styles = {
     background: 'none',
     border: 'none',
     cursor: 'pointer',
-    fontSize: '32px', // Αυξήστε το μέγεθος του κουμπιού
+    fontSize: '42px', // Αυξήστε το μέγεθος του κουμπιού
     color: '#555',
     position: 'fixed',
     bottom: '50px', // Απόσταση από το κάτω μέρος της οθόνης
