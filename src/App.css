@@ -1,3 +1,10 @@
+body {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
 .App {
   position: relative;
   width: 100%;
@@ -305,4 +312,9 @@ button.refresh-button:hover {
   color: #000000 !important;
   transform: scale(1.1) !important;
   text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.9) !important;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
 }
