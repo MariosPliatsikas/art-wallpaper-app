@@ -216,8 +216,8 @@
 
 .fallback {
   font-family: 'Dancing Script', cursive; /* Καλλιτεχνική γραμματοσειρά */
-  font-size: 1.5rem; /* Μέγεθος γραμματοσειράς */
-  color: #555; /* Απαλό γκρι χρώμα */
+  font-size: 1.9rem; /* Μέγεθος γραμματοσειράς */
+  color: #7b7b7b; /* Απαλό γκρι χρώμα */
   text-align: center; /* Κεντραρισμένο κείμενο */
   margin-top: 20%; /* Απόσταση από την κορυφή */
 }
@@ -238,12 +238,30 @@
 }
 
 .button-container {
+  display: flex; /* Στοίχιση κουμπιών σε σειρά */
+  gap: 10px; /* Απόσταση μεταξύ των κουμπιών */
   position: absolute; /* Τοποθέτηση σε απόλυτη θέση */
   top: 10px; /* Απόσταση από την κορυφή */
   right: 10px; /* Απόσταση από τη δεξιά πλευρά */
-  display: flex; /* Χρήση flexbox για στοίχιση */
-  gap: 10px; /* Απόσταση μεταξύ των κουμπιών */
   z-index: 1000; /* Εξασφαλίζει ότι τα κουμπιά είναι πάνω από άλλα στοιχεία */
+}
+
+.button-container button {
+  padding: 5px 10px; /* Μέγεθος κουμπιού */
+  font-size: 16px; /* Μέγεθος γραμματοσειράς */
+  font-family: 'Dancing Script', cursive; /* Καλλιτεχνική γραμματοσειρά */
+  background-color: rgba(134, 131, 131, 0.2); /* Διαφανές φόντο */
+  color: #060606; /* Λευκό χρώμα γραμμάτων */
+  border: 1px solid rgba(255, 255, 255, 0.5); /* Διαφανές περίγραμμα */
+  border-radius: 16px; /* Στρογγυλεμένες γωνίες */
+  cursor: pointer; /* Δείκτης χεριού για κλικ */
+  transition: all 0.3s ease-in-out; /* Ομαλή μετάβαση για hover */
+}
+
+.button-container button:hover {
+  background-color: rgba(201, 198, 198, 0.4); /* Λιγότερο διαφανές όταν γίνεται hover */
+  color: #000000; /* Μαύρο χρώμα γραμμάτων όταν γίνεται hover */
+  transform: scale(1.05); /* Ελαφρώς μεγαλύτερο μέγεθος όταν γίνεται hover */
 }
 
 button.hidden,
@@ -266,21 +284,25 @@ button.visible {
   opacity: 1; /* Κάνει το κουμπί ορατό */
 }
 
-.refresh-button {
-  position: absolute; /* Τοποθέτηση σε απόλυτη θέση */
-  bottom: 20px; /* Απόσταση από το κάτω μέρος */
-  right: 20px; /* Απόσταση από τη δεξιά πλευρά */
-  padding: 20px 25px; /* Μεγαλύτερο padding για μεγαλύτερο κουμπί */
-  font-size: 18px; /* Μεγαλύτερο μέγεθος γραμματοσειράς */
-  background-color: rgba(255, 255, 255, 0.5); /* Λευκό με 30% διαφάνεια */
-  border: 2px solid rgba(255, 255, 255, 0.5); /* Διαφανές περίγραμμα */
-  border-radius: 12px; /* Στρογγυλεμένες γωνίες */
-  cursor: pointer; /* Δείκτης χεριού για κλικ */
-  transition: all 0.3s ease-in-out; /* Ομαλή μετάβαση για hover */
-  color: #000; /* Μαύρο χρώμα κειμένου */
+button.refresh-button {
+  position: absolute !important;
+  bottom: 20px !important;
+  right: 20px !important;
+  padding: 15px 20px !important;
+  font-size: 20px !important;
+  font-family: 'Dancing Script', cursive !important;
+  background-color: rgba(255, 255, 255, 0.3) !important;
+  color: #ffffff !important;
+  border: 2px solid rgba(255, 255, 255, 0.5) !important;
+  border-radius: 20px !important;
+  cursor: pointer !important;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7) !important;
+  transition: all 0.3s ease-in-out !important;
 }
 
-.refresh-button:hover {
-  background-color: rgba(255, 255, 255, 0.6); /* Λιγότερο διαφανές όταν γίνεται hover */
-  transform: scale(1.1); /* Ελαφρώς μεγαλύτερο μέγεθος όταν γίνεται hover */
+button.refresh-button:hover {
+  background-color: rgba(255, 255, 255, 0.6) !important;
+  color: #000000 !important;
+  transform: scale(1.1) !important;
+  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.9) !important;
 }

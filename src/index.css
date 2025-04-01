@@ -15,7 +15,7 @@ html, body {
 
 /* Links */
 a {
-  color: #61dafb; /* Προεπιλεγμένο χρώμα για links */
+  color: #2b3535; /* Προεπιλεγμένο χρώμα για links */
   text-decoration: none;
 }
 
@@ -24,9 +24,9 @@ a:hover {
 }
 
 /* Buttons */
-button {
-  background-color: #61dafb;
-  color: #000;
+button:not(.refresh-button) {
+  background-color: #212628;
+  color: #a9a7a7;
   border: none;
   padding: 10px 20px;
   border-radius: 5px;
@@ -34,22 +34,22 @@ button {
   font-size: 1rem;
 }
 
-button:hover {
-  background-color: #21a1f1;
+button:not(.refresh-button):hover {
+  background-color: #68899a;
 }
 
 /* Code blocks */
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
   background-color: #282c34;
-  color: #61dafb;
+  color: #a5cbcb;
   padding: 2px 4px;
   border-radius: 3px;
 }
 
 pre {
   background-color: #282c34;
-  color: #61dafb;
+  color: #9ea3a4;
   padding: 10px;
   border-radius: 5px;
   overflow-x: auto;
