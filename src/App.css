@@ -204,15 +204,20 @@ body {
 }
 
 .clear-favorites-button {
-  background: rgba(255, 0, 0, 0.5); /* Κόκκινο κουμπί με διαφάνεια */
+  background: linear-gradient(to right, #3f322d, #483027); /* Gradient από κοραλί σε κόκκινο */
   border: none;
   border-radius: 5px;
-  padding: 5px 10px;
+  padding: 10px 15px; /* Ελαφρώς μεγαλύτερα padding */
   font-size: 1rem;
-  color: white;
+  color: white; /* Λευκό χρώμα κειμένου */
   cursor: pointer;
   margin-bottom: 10px;
-  transition: opacity 0.3s ease;
+  transition: all 0.3s ease; /* Ομαλή μετάβαση για hover */
+}
+
+.clear-favorites-button:hover {
+  background: linear-gradient(to right, #554441, #ff0000); /* Ελαφρώς πιο σκούρο gradient στο hover */
+  transform: scale(1.05); /* Ελαφρώς μεγαλύτερο μέγεθος στο hover */
 }
 
 .audio-player {
@@ -224,7 +229,7 @@ body {
 .fallback {
   font-family: 'Dancing Script', cursive; /* Καλλιτεχνική γραμματοσειρά */
   font-size: 1.9rem; /* Μέγεθος γραμματοσειράς */
-  color: #7b7b7b; /* Απαλό γκρι χρώμα */
+  color: #555353; /* Απαλό γκρι χρώμα */
   text-align: center; /* Κεντραρισμένο κείμενο */
   margin-top: 20%; /* Απόσταση από την κορυφή */
 }
