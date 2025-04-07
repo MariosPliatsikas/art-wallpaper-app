@@ -20,8 +20,8 @@
     <style>
       .app-title {
         position: absolute;
-        top: 10px;
-        left: 30px;
+        top: 20px;
+        left: 20px;
         font-family: 'Dancing Script', cursive;
         font-size: 32px;
         background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
@@ -29,12 +29,59 @@
         -webkit-text-fill-color: transparent;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         z-index: 1000;
+        opacity: 1; /* Αρχικά ορατό */
+        transition: opacity 4s ease; /* Αργή μετάβαση */
+      }
+
+      .app-title.hidden {
+        opacity: 0; /* Κάνει τον τίτλο αόρατο */
       }
     </style>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-    <div class="app-title">Art-Wallpaper-App</div>
+    <div class="app-title" id="appTitle">Art-Wallpaper-App</div>
+
+    <script>
+      const title = document.getElementById('appTitle');
+
+      // Λειτουργία για να κρύβει τον τίτλο
+      const hideTitle = () => {
+        title.classList.add('hidden');
+      };
+
+      // Λειτουργία για να εμφανίζει τον τίτλο
+      const showTitle = () => {
+        title.classList.remove('hidden');
+      };
+
+      // Επαναλαμβανόμενο χρονόμετρο για να κρύβει τον τίτλο κάθε 7 δευτερόλεπτα
+      let hideInterval = setInterval(hideTitle, 7000);
+
+      // Επανεμφανίζει τον τίτλο με την αλληλεπίδραση του χρήστη
+      title.addEventListener('mouseenter', () => {
+        showTitle();
+        clearInterval(hideInterval); // Σταματά το χρονόμετρο προσωρινά
+      });
+
+      title.addEventListener('mouseleave', () => {
+        hideInterval = setInterval(hideTitle, 7000); // Ξεκινά ξανά το χρονόμετρο
+      });
+
+      // Επανεμφανίζεται με κλικ
+      document.body.addEventListener('click', () => {
+        showTitle();
+        clearInterval(hideInterval); // Σταματά το χρονόμετρο προσωρινά
+        hideInterval = setInterval(hideTitle, 7000); // Ξεκινά ξανά το χρονόμετρο
+      });
+
+      // Επανεμφανίζεται με την κίνηση του κέρσορα
+      document.body.addEventListener('mousemove', () => {
+        showTitle();
+        clearInterval(hideInterval); // Σταματά το χρονόμετρο προσωρινά
+        hideInterval = setInterval(hideTitle, 7000); // Ξεκινά ξανά το χρονόμετρο
+      });
+    </script>
   </body>
 </html>
