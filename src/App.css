@@ -3,6 +3,10 @@ body {
   padding-bottom: env(safe-area-inset-bottom);
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
+  font-size: 16px;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
 }
 
 .App {
@@ -322,4 +326,50 @@ button.refresh-button:hover {
 img {
   max-width: 100%;
   height: auto;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Responsive styles for tablets */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+
+  .container {
+    padding: 10px;
+  }
+
+  button {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+}
+
+/* Responsive styles for iPhones and small screens */
+@media (max-width: 480px) {
+  body {
+    font-size: 12px;
+  }
+
+  .container {
+    padding: 5px;
+  }
+
+  button {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+
+  .refresh-button {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    font-size: 14px;
+    padding: 10px 15px;
+  }
 }
