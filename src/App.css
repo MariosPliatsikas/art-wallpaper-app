@@ -379,3 +379,13 @@ img {
     padding: 10px 15px;
   }
 }
+
+.google-search-link {
+  color: #8a959f; /* Φωτεινό μπλε χρώμα */
+  text-decoration: none; /* Αφαίρεση υπογράμμισης */
+}
+
+.google-search-link:hover {
+  color: #e5ecf3; /* Σκούρο μπλε για hover */
+  text-decoration: underline; /* Υπογράμμιση όταν περνάει ο δείκτης */
+}

@@ -5,13 +5,28 @@ function ArtworkInfo({ artwork }) {
     return null; // Αν δεν υπάρχει έργο τέχνης, μην εμφανίσεις τίποτα
   }
 
+  const generateGoogleSearchLink = (title) => {
+    const query = encodeURIComponent(`${title} museum`);
+    return `https://www.google.com/search?q=${query}`;
+  };
+
   return (
     <div className="artwork-info">
       {artwork.artistDisplayName && (
         <p className="artist-name"><strong>Artist:</strong> {artwork.artistDisplayName}</p>
       )}
       {artwork.title && (
-        <p className="artwork-title"><strong>Title:</strong> {artwork.title}</p>
+        <p className="artwork-title">
+          <strong>Title:</strong>{' '}
+          <a 
+            href={generateGoogleSearchLink(artwork.title)} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="google-search-link"
+          >
+            {artwork.title}
+          </a>
+        </p>
       )}
       {artwork.objectDate && (
         <p className="artwork-date"><strong>Date:</strong> {artwork.objectDate}</p>
