@@ -19,6 +19,9 @@ function ArtworkInfo({ artwork }) {
       {artwork.medium && (
         <p className="artwork-medium">{artwork.medium}</p>
       )}
+      {artwork.source && ( // Εμφάνιση της πηγής αν υπάρχει
+        <p className="artwork-source">Source: {artwork.source}</p>
+      )}
     </div>
   );
 }
