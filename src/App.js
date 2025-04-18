@@ -8,6 +8,7 @@ import './App.css';
 import { useNavigate } from 'react-router-dom';
 import config from './config';
 import { saveFavorite, getFavorites, clearFavorites } from './database'; // Adding clearFavorites functionality
+import OpenSeadragon from 'openseadragon';
 
 function App() {
   const artwork = useArtwork();
@@ -19,6 +20,7 @@ function App() {
   const [selectedArtwork, setSelectedArtwork] = useState(null); // State for the selected artwork
   const [hideButtons, setHideButtons] = useState(false); // State for hiding buttons
   const [showFallback, setShowFallback] = useState(false); // State for fallback display
+  const [showCanvas, setShowCanvas] = useState(false); // State για την εμφάνιση του canvas
   const navigate = useNavigate();
 
   // Timer to show text (15 seconds)
@@ -101,6 +103,7 @@ function App() {
   const handleSelectFavorite = (item) => {
     setSelectedArtwork(item);
     setShowFavorites(false); // Hide the favorites list
+    setShowCanvas(true); // Εμφάνιση του canvas
   };
 
   const handleClearFavorites = () => {
@@ -149,6 +152,25 @@ function App() {
       setShowFallback(false); // Επαναφορά αν υπάρχει artwork
     }
   }, [artworkToShow]);
+
+  useEffect(() => {
+    if (showCanvas) {
+      const viewer = OpenSeadragon({
+        id: 'openseadragon-canvas',
+        prefixUrl: '/node_modules/openseadragon/images/', // Ενημερώστε τη διαδρομή αν χρειάζεται
+        tileSources: {
+          type: 'image',
+          url: selectedArtwork?.primaryImage, // Το URL της εικόνας
+        },
+      });
+
+      console.log('OpenSeadragon initialized');
+
+      return () => {
+        viewer.destroy(); // Καθαρισμός όταν το component αποσυνδέεται
+      };
+    }
+  }, [showCanvas, selectedArtwork]);
 
   if (!artworkToShow || !artworkToShow.primaryImage) {
     if (!showFallback) {
@@ -199,6 +221,21 @@ function App() {
           onClearFavorites={handleClearFavorites}
         />
       )}
+
+      {/* Εμφάνιση του OpenSeadragon Canvas */}
+      {showCanvas && (
+        <div
+          id="openseadragon-canvas"
+          style={{
+            width: '100%',
+            height: '100%',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+          }}
+        ></div>
+      )}
+
       <RefreshButton className="refresh-button" hidden={hideButtons} />
     </div>
   );
