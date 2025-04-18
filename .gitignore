@@ -70,4 +70,4 @@ migrations/
 # ================================
 # .gitignore
 # ================================
-art-wallpaper-app/
+art-wallpaper-app/.env
