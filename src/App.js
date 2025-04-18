@@ -111,6 +111,10 @@ function App() {
     setFavorites([]);
   };
 
+  const handleExitCanvas = () => {
+    setShowCanvas(false); // Απόκρυψη του canvas
+  };
+
   const artworkToShow = selectedArtwork || artwork;
 
   useEffect(() => {
@@ -224,16 +228,35 @@ function App() {
 
       {/* Εμφάνιση του OpenSeadragon Canvas */}
       {showCanvas && (
-        <div
-          id="openseadragon-canvas"
-          style={{
-            width: '100%',
-            height: '100%',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-          }}
-        ></div>
+        <>
+          <div
+            id="openseadragon-canvas"
+            style={{
+              width: '100%',
+              height: '100%',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+            }}
+          ></div>
+          <button
+            onClick={handleExitCanvas}
+            style={{
+              position: 'absolute',
+              top: '10px',
+              right: '10px',
+              zIndex: 1000, // Βεβαιωθείτε ότι το κουμπί εμφανίζεται πάνω από το canvas
+              padding: '10px 20px',
+              backgroundColor: '#ff4d4d',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer',
+            }}
+          >
+            Exit
+          </button>
+        </>
       )}
 
       <RefreshButton className="refresh-button" hidden={hideButtons} />
