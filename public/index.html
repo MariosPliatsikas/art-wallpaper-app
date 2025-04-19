@@ -23,63 +23,82 @@
         top: 60px;
         left: 25px;
         font-family: 'Dancing Script', cursive;
-        font-size: 32px;
-        color: #b4b2b2; /* Απλό χρώμα για το κείμενο */
+        font-size: 38px;
+        color: #b4b2b2;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         z-index: 1000;
-        opacity: 1; /* Αρχικά ορατό */
-        transition: opacity 4s ease; /* Αργή μετάβαση */
+        opacity: 1;
+        transition: opacity 0.5s ease; /* Ομαλή μετάβαση */
       }
 
       .app-title.hidden {
         opacity: 0; /* Κάνει τον τίτλο αόρατο */
+      }
+
+      .letter {
+        display: inline-block;
+        transform: scale(0);
       }
     </style>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-    <div class="app-title" id="appTitle">Art-Wallpaper-App</div>
+    <div class="app-title" id="appTitle">
+      Art-Wallpaper-App
+    </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script>
       const title = document.getElementById('appTitle');
+      const letters = title.textContent.split('').map((char) => {
+        const span = document.createElement('span');
+        span.textContent = char === ' ' ? '\u00A0' : char;
+        span.classList.add('letter');
+        return span;
+      });
 
-      // Λειτουργία για να κρύβει τον τίτλο
-      const hideTitle = () => {
+      // Καθαρισμός του τίτλου και προσθήκη των γραμμάτων
+      title.textContent = '';
+      letters.forEach((letter) => title.appendChild(letter));
+
+      // GSAP Animation για την εμφάνιση του τίτλου
+      const timeline = gsap.timeline({ paused: true });
+      timeline
+        .to('.app-title', { opacity: 1, duration: 0.5 })
+        .to('.letter', {
+          scale: 1,
+          stagger: 0.2,
+          duration: 1.5,
+          ease: 'back.out(1.7)',
+        });
+
+      // Εμφάνιση του τίτλου κατά την αρχική φόρτωση
+      timeline.play();
+
+      // Απόκρυψη του τίτλου μετά από 3 δευτερόλεπτα
+      let hideTimeout = setTimeout(() => {
         title.classList.add('hidden');
-      };
+      }, 3000);
 
-      // Λειτουργία για να εμφανίζει τον τίτλο
+      let isTitleVisible = true; // Κατάσταση για να ελέγχει αν ο τίτλος είναι ορατός
+
+      // Εμφάνιση του τίτλου με την κίνηση του κέρσορα ή την αφή
       const showTitle = () => {
-        title.classList.remove('hidden');
+        if (!isTitleVisible) {
+          title.classList.remove('hidden');
+          timeline.restart(); // Επανεκκίνηση του animation
+          isTitleVisible = true; // Ενημέρωση της κατάστασης
+          clearTimeout(hideTimeout); // Καθαρισμός του προηγούμενου timeout
+          hideTimeout = setTimeout(() => {
+            title.classList.add('hidden');
+            isTitleVisible = false; // Ενημέρωση της κατάστασης
+          }, 3000); // Απόκρυψη ξανά μετά από 3 δευτερόλεπτα
+        }
       };
 
-      // Επαναλαμβανόμενο χρονόμετρο για να κρύβει τον τίτλο κάθε 7 δευτερόλεπτα
-      let hideInterval = setInterval(hideTitle, 7000);
-
-      // Επανεμφανίζει τον τίτλο με την αλληλεπίδραση του χρήστη
-      title.addEventListener('mouseenter', () => {
-        showTitle();
-        clearInterval(hideInterval); // Σταματά το χρονόμετρο προσωρινά
-      });
-
-      title.addEventListener('mouseleave', () => {
-        hideInterval = setInterval(hideTitle, 7000); // Ξεκινά ξανά το χρονόμετρο
-      });
-
-      // Επανεμφανίζεται με κλικ
-      document.body.addEventListener('click', () => {
-        showTitle();
-        clearInterval(hideInterval); // Σταματά το χρονόμετρο προσωρινά
-        hideInterval = setInterval(hideTitle, 7000); // Ξεκινά ξανά το χρονόμετρο
-      });
-
-      // Επανεμφανίζεται με την κίνηση του κέρσορα
-      document.body.addEventListener('mousemove', () => {
-        showTitle();
-        clearInterval(hideInterval); // Σταματά το χρονόμετρο προσωρινά
-        hideInterval = setInterval(hideTitle, 7000); // Ξεκινά ξανά το χρονόμετρο
-      });
+      document.body.addEventListener('mousemove', showTitle);
+      document.body.addEventListener('touchstart', showTitle);
     </script>
   </body>
 </html>
