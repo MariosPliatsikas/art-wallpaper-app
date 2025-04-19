@@ -50,6 +50,19 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script>
+      const HIDE_DELAY = 7000;
+      const ANIMATION_DURATION = 1.5;
+      const STAGGER_DELAY = 0.2;
+
+      // Υλοποίηση της debounce
+      const debounce = (func, delay) => {
+        let timeout;
+        return (...args) => {
+          clearTimeout(timeout);
+          timeout = setTimeout(() => func(...args), delay);
+        };
+      };
+
       const title = document.getElementById('appTitle');
       const letters = title.textContent.split('').map((char) => {
         const span = document.createElement('span');
@@ -58,46 +71,45 @@
         return span;
       });
 
-      // Καθαρισμός του τίτλου και προσθήκη των γραμμάτων
       title.textContent = '';
       letters.forEach((letter) => title.appendChild(letter));
 
-      // GSAP Animation για την εμφάνιση του τίτλου
       const timeline = gsap.timeline({ paused: true });
       timeline
         .to('.app-title', { opacity: 1, duration: 0.5 })
         .to('.letter', {
           scale: 1,
-          stagger: 0.2,
-          duration: 1.5,
+          stagger: STAGGER_DELAY,
+          duration: ANIMATION_DURATION,
           ease: 'back.out(1.7)',
         });
 
-      // Εμφάνιση του τίτλου κατά την αρχική φόρτωση
       timeline.play();
 
-      // Απόκρυψη του τίτλου μετά από 3 δευτερόλεπτα
-      let hideTimeout = setTimeout(() => {
-        title.classList.add('hidden');
-      }, 3000);
+      const titleState = {
+        isVisible: true,
+        hideTimeout: null,
+      };
 
-      let isTitleVisible = true; // Κατάσταση για να ελέγχει αν ο τίτλος είναι ορατός
-
-      // Εμφάνιση του τίτλου με την κίνηση του κέρσορα ή την αφή
-      const showTitle = () => {
-        if (!isTitleVisible) {
-          title.classList.remove('hidden');
-          timeline.restart(); // Επανεκκίνηση του animation
-          isTitleVisible = true; // Ενημέρωση της κατάστασης
-          clearTimeout(hideTimeout); // Καθαρισμός του προηγούμενου timeout
-          hideTimeout = setTimeout(() => {
-            title.classList.add('hidden');
-            isTitleVisible = false; // Ενημέρωση της κατάστασης
-          }, 3000); // Απόκρυψη ξανά μετά από 3 δευτερόλεπτα
+      const hideTitle = () => {
+        if (titleState.isVisible) {
+          gsap.to('.app-title', { opacity: 0, duration: 0.5 });
+          titleState.isVisible = false;
         }
       };
 
-      document.body.addEventListener('mousemove', showTitle);
+      const showTitle = () => {
+        if (!titleState.isVisible) {
+          gsap.to('.app-title', { opacity: 1, duration: 0.5 });
+          timeline.restart();
+          titleState.isVisible = true;
+
+          clearTimeout(titleState.hideTimeout);
+          titleState.hideTimeout = setTimeout(hideTitle, HIDE_DELAY);
+        }
+      };
+
+      document.body.addEventListener('mousemove', debounce(showTitle, 200));
       document.body.addEventListener('touchstart', showTitle);
     </script>
   </body>
