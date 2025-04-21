@@ -1,88 +1,114 @@
-/* Global styles */
+
+/* src/index.css */
+
+/* Global styles for the Art Wallpaper App */
 html, body {
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100%;
-  overflow: auto; /* Επιτρέπει την κύλιση */
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 
-'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  overflow-y: auto; /* Allow vertical scrolling */
+  font-family: 'Dancing Script', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-size: 16px; /* Base font size */
+  padding-top: env(safe-area-inset-top); /* Safe area for mobile devices */
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #000; /* Προεπιλεγμένο φόντο */
-  color: #fff; /* Προεπιλεγμένο χρώμα κειμένου */
+  background-color: #000; /* Default black background */
+  color: #fff; /* Default white text */
+}
+
+/* Application title */
+.app-title {
+  position: absolute;
+  top: 50px; /* Adjusted to balance larger font */
+  left: 25px;
+  font-family: 'Dancing Script', cursive;
+  font-size: 48px; /* Larger font size */
+  color: #b4b2b2;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  z-index: 999; /* Below .category-menu (z-index: 1000) */
+  opacity: 1;
+  transition: opacity 3s ease; /* Slower transition to match buttons */
+}
+
+.app-title.hidden {
+  opacity: 0;
+}
+
+.letter {
+  display: inline-block;
+  transform: scale(0);
 }
 
 /* Links */
 a {
-  color: #2b3535; /* Προεπιλεγμένο χρώμα για links */
+  color: #8a959f; /* Light gray for better contrast */
   text-decoration: none;
+  transition: color 0.3s ease;
 }
 
-a:hover {
+a:hover,
+a:focus {
+  color: #e5ecf3; /* Lighter gray on hover/focus */
   text-decoration: underline;
+  outline: none;
 }
 
-/* Buttons */
-button:not(.refresh-button) {
-  background-color: #212628;
-  color: #a9a7a7;
+/* Default button styles */
+button {
+  background: linear-gradient(to right, #3f322d, #483027); /* Gradient background */
+  color: #fff;
   border: none;
   padding: 10px 20px;
   border-radius: 5px;
   cursor: pointer;
   font-size: 1rem;
+  font-family: 'Dancing Script', cursive;
+  transition: all 0.3s ease;
 }
 
-button:not(.refresh-button):hover {
-  background-color: #68899a;
-}
-
-/* Code blocks */
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
-  background-color: #282c34;
-  color: #a5cbcb;
-  padding: 2px 4px;
-  border-radius: 3px;
-}
-
-pre {
-  background-color: #282c34;
-  color: #9ea3a4;
-  padding: 10px;
-  border-radius: 5px;
-  overflow-x: auto;
+button:hover,
+button:focus {
+  background: linear-gradient(to right, #554441, #ff0000); /* Hover gradient */
+  transform: scale(1.05);
+  outline: 2px solid #fff;
+  outline-offset: 2px;
 }
 
 /* Responsive styles for tablets */
 @media (max-width: 768px) {
-  body {
-    font-size: 14px; /* Μικρότερο μέγεθος γραμματοσειράς */
+  html, body {
+    font-size: 14px; /* Smaller font size for tablets */
   }
 
   button {
-    font-size: 14px; /* Προσαρμογή μεγέθους κουμπιών */
+    font-size: 0.9rem;
     padding: 8px 16px;
+  }
+
+  .app-title {
+    font-size: 40px; /* Larger font for tablets */
+    top: 45px;
   }
 }
 
-/* Responsive styles for iPhones and small screens */
+/* Responsive styles for small screens */
 @media (max-width: 480px) {
-  body {
-    font-size: 12px; /* Ακόμα μικρότερο μέγεθος γραμματοσειράς */
+  html, body {
+    font-size: 12px; /* Smallest font size for mobile */
   }
 
   button {
-    font-size: 12px; /* Προσαρμογή μεγέθους κουμπιών */
+    font-size: 0.8rem;
     padding: 6px 12px;
   }
 
-  .refresh-button {
-    position: fixed; /* Σταθερή θέση */
-    bottom: 10px; /* Απόσταση από το κάτω μέρος */
-    right: 10px; /* Απόσταση από τη δεξιά πλευρά */
-    font-size: 14px; /* Μικρότερο μέγεθος γραμματοσειράς */
-    padding: 10px 15px;
+  .app-title {
+    font-size: 34px; /* Larger font for mobile */
+    top: 40px;
   }
 }

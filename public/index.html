@@ -1,13 +1,14 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="description" content="Art Wallpaper App - Change your wallpaper to random artworks from museums and enjoy music from MusicBrainz." />
-    <meta name="keywords" content="art, wallpaper, music, react, three.js" />
+    <meta name="description" content="Art Wallpaper App - Change your wallpaper to random artworks from museums." />
+    <meta name="keywords" content="art, wallpaper, react, three.js" />
     <meta name="author" content="Marios Pliatsikas" />
     <meta property="og:title" content="Art Wallpaper App" />
-    <meta property="og:description" content="Change your wallpaper to random artworks from museums and enjoy music from MusicBrainz." />
+    <meta property="og:description" content="Change your wallpaper to random artworks from museums." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://art-wallpaper-app.vercel.app" />
     <meta property="og:image" content="https://art-wallpaper-app.vercel.app/logo.png" />
@@ -16,45 +17,23 @@
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <link rel="manifest" href="/manifest.json" />
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="%PUBLIC_URL%/index.css" />
     <title>Art Wallpaper App</title>
-    <style>
-      .app-title {
-        position: absolute;
-        top: 60px;
-        left: 25px;
-        font-family: 'Dancing Script', cursive;
-        font-size: 38px;
-        color: #b4b2b2;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        z-index: 1000;
-        opacity: 1;
-        transition: opacity 0.5s ease; /* Ομαλή μετάβαση */
-      }
-
-      .app-title.hidden {
-        opacity: 0; /* Κάνει τον τίτλο αόρατο */
-      }
-
-      .letter {
-        display: inline-block;
-        transform: scale(0);
-      }
-    </style>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
     <div class="app-title" id="appTitle">
-      Art-Wallpaper-App
+      Art Wallpaper App
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script>
-      const HIDE_DELAY = 7000;
-      const ANIMATION_DURATION = 1.5;
-      const STAGGER_DELAY = 0.2;
+      const HIDE_DELAY = 7000; /* Hide title after 7 seconds */
+      const ANIMATION_DURATION = 1.5; /* Duration for letter animation */
+      const STAGGER_DELAY = 0.2; /* Stagger delay for letter animation */
 
-      // Υλοποίηση της debounce
+      /* Debounce implementation */
       const debounce = (func, delay) => {
         let timeout;
         return (...args) => {
@@ -75,16 +54,16 @@
       letters.forEach((letter) => title.appendChild(letter));
 
       const timeline = gsap.timeline({ paused: true });
-      timeline
-        .to('.app-title', { opacity: 1, duration: 0.5 })
-        .to('.letter', {
-          scale: 1,
-          stagger: STAGGER_DELAY,
-          duration: ANIMATION_DURATION,
-          ease: 'back.out(1.7)',
-        });
+      timeline.to('.letter', {
+        scale: 1,
+        stagger: STAGGER_DELAY,
+        duration: ANIMATION_DURATION,
+        ease: 'back.out(1.7)',
+      });
 
+      /* Initial animation */
       timeline.play();
+      console.log('Title initialized: visible');
 
       const titleState = {
         isVisible: true,
@@ -93,21 +72,25 @@
 
       const hideTitle = () => {
         if (titleState.isVisible) {
-          gsap.to('.app-title', { opacity: 0, duration: 0.5 });
+          title.classList.add('hidden');
           titleState.isVisible = false;
+          console.log('Title hidden after 7 seconds');
         }
       };
 
       const showTitle = () => {
         if (!titleState.isVisible) {
-          gsap.to('.app-title', { opacity: 1, duration: 0.5 });
+          title.classList.remove('hidden');
           timeline.restart();
           titleState.isVisible = true;
-
-          clearTimeout(titleState.hideTimeout);
-          titleState.hideTimeout = setTimeout(hideTitle, HIDE_DELAY);
+          console.log('Title shown');
         }
+        clearTimeout(titleState.hideTimeout);
+        titleState.hideTimeout = setTimeout(hideTitle, HIDE_DELAY);
       };
+
+      /* Initial hide after 7 seconds */
+      titleState.hideTimeout = setTimeout(hideTitle, HIDE_DELAY);
 
       document.body.addEventListener('mousemove', debounce(showTitle, 200));
       document.body.addEventListener('touchstart', showTitle);

@@ -1,91 +1,104 @@
-import config from './config'; // Εισαγωγή του config
 
+import config from './config'; // Import configuration
+
+/**
+ * Fetches artwork from Metropolitan Museum API with fallback to Harvard Museum API.
+ * @param {string} query - Search query (default: 'painting')
+ * @returns {Promise<Object|null>} Artwork object or null if failed
+ */
 export async function fetchArtwork(query = 'painting') {
+  // Attempt to fetch from Metropolitan Museum API
   try {
-    // Βήμα 1: Αναζήτηση για έργα τέχνης στο Metropolitan Museum
+    // Step 1: Search for artworks
     const searchResponse = await fetch(
       `${config.MET_MUSEUM_API_URL}/search?hasImages=true&q=${query}`
     );
 
     if (!searchResponse.ok) {
-      throw new Error('Failed to fetch artwork list from Metropolitan Museum');
+      throw new Error(`Metropolitan Museum search failed: ${searchResponse.status}`);
     }
 
     const searchData = await searchResponse.json();
+    console.log('Metropolitan search data:', searchData); // Debug response
 
-    // Έλεγχος αν υπάρχουν διαθέσιμα έργα τέχνης
+    // Check if artworks are available
     if (!searchData.objectIDs || searchData.objectIDs.length === 0) {
       throw new Error('No artworks found in Metropolitan Museum');
     }
 
-    // Επιλογή τυχαίου έργου τέχνης
+    // Select random artwork
     const randomIndex = Math.floor(Math.random() * searchData.objectIDs.length);
     const artworkID = searchData.objectIDs[randomIndex];
 
-    // Βήμα 2: Ανάκτηση λεπτομερειών για το συγκεκριμένο έργο τέχνης
+    // Step 2: Fetch artwork details
     const artworkResponse = await fetch(
       `${config.MET_MUSEUM_API_URL}/objects/${artworkID}`
     );
 
     if (!artworkResponse.ok) {
-      throw new Error('Failed to fetch artwork details from Metropolitan Museum');
+      throw new Error(`Metropolitan Museum details fetch failed: ${artworkResponse.status}`);
     }
 
     const fetchedArtwork = await artworkResponse.json();
+    console.log('Metropolitan artwork details:', fetchedArtwork); // Debug response
 
-    // Έλεγχος αν το έργο έχει εικόνα
+    // Validate primary image
     if (!fetchedArtwork.primaryImage || fetchedArtwork.primaryImage === '') {
-      throw new Error('Artwork from Metropolitan Museum has no image');
+      throw new Error('Metropolitan artwork missing primary image');
     }
 
-    // Επιστροφή έργου τέχνης από το Metropolitan Museum
+    // Return normalized artwork object
     return {
       primaryImage: fetchedArtwork.primaryImage,
       title: fetchedArtwork.title || 'Untitled',
       objectDate: fetchedArtwork.objectDate || 'Unknown Date',
-      artist: fetchedArtwork.artistDisplayName || 'Unknown Artist',
-      source: 'Metropolitan Museum', // Προσθήκη πηγής
+      artistDisplayName: fetchedArtwork.artistDisplayName || 'Unknown Artist',
+      medium: fetchedArtwork.medium || 'Unknown Medium',
+      source: 'Metropolitan Museum',
     };
   } catch (error) {
-    console.warn('Falling back to Harvard Museum API:', error);
+    console.warn('Metropolitan Museum API failed:', error);
 
-    // Fallback: Αναζήτηση στο Harvard Museum API
+    // Fallback to Harvard Museum API
     try {
       const harvardResponse = await fetch(
         `${config.HARVARD_API_URL}/object?apikey=${config.HARVARD_API_KEY}&hasimage=1&size=100&q=${query}`
       );
 
       if (!harvardResponse.ok) {
-        throw new Error('Failed to fetch artwork from Harvard Museum');
+        throw new Error(`Harvard Museum fetch failed: ${harvardResponse.status}`);
       }
 
       const harvardData = await harvardResponse.json();
+      console.log('Harvard search data:', harvardData); // Debug response
 
-      // Έλεγχος αν υπάρχουν διαθέσιμα έργα τέχνης
+      // Check if artworks are available
       if (!harvardData.records || harvardData.records.length === 0) {
         throw new Error('No artworks found in Harvard Museum');
       }
 
-      // Επιλογή τυχαίου έργου τέχνης
+      // Select random artwork
       const randomIndex = Math.floor(Math.random() * harvardData.records.length);
       const harvardArtwork = harvardData.records[randomIndex];
+      console.log('Harvard selected artwork:', harvardArtwork); // Debug response
 
-      // Έλεγχος αν το έργο έχει εικόνα
+      // Validate primary image
       if (!harvardArtwork.primaryimageurl || harvardArtwork.primaryimageurl === '') {
-        throw new Error('Artwork from Harvard Museum has no image');
+        throw new Error('Harvard artwork missing primary image');
       }
 
-      // Επιστροφή έργου τέχνης από το Harvard Museum
+      // Return normalized artwork object
       return {
         primaryImage: harvardArtwork.primaryimageurl,
         title: harvardArtwork.title || 'Untitled',
         objectDate: harvardArtwork.dated || 'Unknown Date',
-        artist: harvardArtwork.people?.[0]?.name || 'Unknown Artist',
-        source: 'Harvard Museum', // Προσθήκη πηγής
+        artistDisplayName: harvardArtwork.people?.[0]?.name || 'Unknown Artist',
+        medium: harvardArtwork.medium || 'Unknown Medium',
+        source: 'Harvard Museum',
       };
     } catch (harvardError) {
-      console.error('Error fetching artwork from Harvard Museum:', harvardError);
-      return null; // Επιστροφή null σε περίπτωση σφάλματος
+      console.error('Harvard Museum API failed:', harvardError);
+      return null; // Return null on failure
     }
   }
 }

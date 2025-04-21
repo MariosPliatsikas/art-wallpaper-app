@@ -1,0 +1,98 @@
+
+/* src/components/CategoryMenu.css */
+.category-menu {
+    position: absolute;
+    top: 100px;
+    left: 25px;
+    display: flex;
+    gap: 10px;
+    z-index: 1000;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+  }
+  
+  .category-menu.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+  
+  .category-item {
+    position: relative;
+  }
+  
+  .category-button {
+    background: rgba(255, 255, 255, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 5px;
+    padding: 8px 16px;
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.2rem;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .category-button:hover,
+  .category-button:focus {
+    background: rgba(255, 255, 255, 0.6);
+    transform: scale(1.05);
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
+  
+  .subcategory-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 5px;
+    padding: 10px;
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .category-item:hover .subcategory-menu {
+    display: flex;
+  }
+  
+  .subcategory-button {
+    background: transparent;
+    border: none;
+    font-family: 'Dancing Script', cursive;
+    font-size: 1rem;
+    color: #fff;
+    cursor: pointer;
+    text-align: left;
+  }
+  
+  .subcategory-button:hover,
+  .subcategory-button:focus {
+    color: #e5ecf3;
+    text-decoration: underline;
+  }
+  
+  @media (max-width: 768px) {
+    .category-menu {
+      top: 80px;
+      left: 20px;
+      flex-direction: column;
+    }
+  
+    .category-button {
+      font-size: 1rem;
+      padding: 6px 12px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .category-menu {
+      top: 60px;
+      left: 15px;
+    }
+  
+    .category-button {
+      font-size: 0.9rem;
+      padding: 5px 10px;
+    }
+  }
