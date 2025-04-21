@@ -25,6 +25,7 @@ const useArtwork = (query = 'painting', subcategory = '') => {
 
   // Function to fetch artwork data
   const getArtwork = useCallback(async () => {
+    console.log('getArtwork called with:', { query, subcategory });
     try {
       setLoading(true);
       setError(null);
@@ -33,22 +34,28 @@ const useArtwork = (query = 'painting', subcategory = '') => {
 
       // Validate fetched artwork
       if (fetchError || !fetchedArtwork || !fetchedArtwork.primaryImage) {
-        console.warn('No valid artwork received, using default');
+        console.warn('No valid artwork received, using default. Details:', {
+          fetchError,
+          fetchedArtwork,
+          hasPrimaryImage: fetchedArtwork?.primaryImage,
+        });
         setError(fetchError || 'No valid artwork found. Using default artwork.');
         setArtwork(defaultArtwork);
       } else {
         // Ensure all fields have fallback values
-        setArtwork({
+        const validatedArtwork = {
           primaryImage: fetchedArtwork.primaryImage,
           title: fetchedArtwork.title || 'Untitled',
           objectDate: fetchedArtwork.objectDate || 'Unknown Date',
           artistDisplayName: fetchedArtwork.artistDisplayName || 'Unknown Artist',
           medium: fetchedArtwork.medium || 'Unknown Medium',
           source: fetchedArtwork.source || 'Unknown Source',
-        });
+        };
+        console.log('Setting validated artwork:', validatedArtwork);
+        setArtwork(validatedArtwork);
       }
     } catch (err) {
-      console.error('Error in useArtwork:', err);
+      console.error('Error in useArtwork:', err.message, err.stack);
       setError(err.message || 'Something went wrong. Please refresh the page.');
       setArtwork(defaultArtwork);
     } finally {

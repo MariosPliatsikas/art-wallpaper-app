@@ -28,10 +28,15 @@ const subcategoryMapping = {
       harvard: 'datebegin>=1600&dateend<=1800',
       nma: 'date>=1600&date<=1800',
     },
-    'Post-1800': {
-      met: 'dateBegin>=1800',
-      harvard: 'datebegin>=1800',
-      nma: 'date>=1800',
+    '1800-1900': {
+      met: 'dateBegin>=1800&dateEnd<=1900',
+      harvard: 'datebegin>=1800&dateend<=1900',
+      nma: 'date>=1800&date<=1900',
+    },
+    '1900-Present': {
+      met: 'dateBegin>=1900',
+      harvard: 'datebegin>=1900',
+      nma: 'date>=1900',
     },
   },
   movement: {
@@ -49,6 +54,11 @@ const subcategoryMapping = {
       met: 'classification:painting+Baroque',
       harvard: 'classification=paintings+Baroque',
       nma: 'Baroque',
+    },
+    Modernism: {
+      met: 'classification:painting+Modern',
+      harvard: 'classification=paintings+Modern',
+      nma: 'Modern',
     },
   },
   type: {
@@ -68,6 +78,42 @@ const subcategoryMapping = {
       nma: 'additionalType:Photograph',
     },
   },
+  museum: {
+    Metropolitan: {
+      met: 'painting',
+      harvard: '',
+      nma: '',
+    },
+    Harvard: {
+      met: '',
+      harvard: 'painting',
+      nma: '',
+    },
+    'National Museum of Australia': {
+      met: '',
+      harvard: '',
+      nma: 'art',
+    },
+  },
+  indigenous: {
+    'Aboriginal Art': {
+      met: 'classification:painting+Aboriginal',
+      harvard: 'classification=paintings+Aboriginal',
+      nma: 'Indigenous+Art',
+    },
+    'Torres Strait Islander Art': {
+      met: 'classification:painting+Torres+Strait',
+      harvard: 'classification=paintings+Torres+Strait',
+      nma: 'Torres+Strait+Art',
+    },
+  },
+  contemporary: {
+    'Contemporary Australian': {
+      met: 'classification:painting+Contemporary+Australian',
+      harvard: 'classification=paintings+Contemporary+Australian',
+      nma: 'Contemporary+Art',
+    },
+  },
 };
 
 /**
@@ -81,15 +127,17 @@ async function fetchWithRetry(url, retries = 3, initialDelay = 1000) {
   for (let i = 0; i < retries; i++) {
     const delay = initialDelay * Math.pow(2, i); // Calculate delay for this retry
     try {
+      console.log(`Fetching URL: ${url}`); // Debug URL
       const response = await fetch(url);
       if (response.ok) return response;
       if (response.status === 429 && i < retries - 1) {
-        console.warn(`Rate limit hit, retrying after ${delay}ms`);
+        console.warn(`Rate limit hit for ${url}, retrying after ${delay}ms`);
         await new Promise((resolve) => setTimeout(resolve, delay));
         continue;
       }
-      throw new Error(`Fetch failed: ${response.status}`);
+      throw new Error(`Fetch failed for ${url}: ${response.status}`);
     } catch (error) {
+      console.error(`Attempt ${i + 1} failed for ${url}:`, error.message);
       if (i === retries - 1) throw error;
     }
   }
@@ -103,6 +151,8 @@ async function fetchWithRetry(url, retries = 3, initialDelay = 1000) {
  * @returns {Promise<{ artwork: Object|null, error: string|null }>} Artwork object or error
  */
 export async function fetchArtwork(query = config.DEFAULT_QUERY, subcategory = '', useMock = false) {
+  console.log('fetchArtwork called with:', { query, subcategory, useMock });
+
   // Return mock data if enabled
   if (useMock) {
     console.log('Using mock artwork');
@@ -128,9 +178,8 @@ export async function fetchArtwork(query = config.DEFAULT_QUERY, subcategory = '
 
   // Attempt Metropolitan Museum API
   try {
-    const searchResponse = await fetchWithRetry(
-      `${config.MET_MUSEUM_API_URL}/search?hasImages=true&isPublicDomain=true&q=${adjustedQueries.met}&size=100`
-    );
+    const metUrl = `${config.MET_MUSEUM_API_URL}/search?hasImages=true&isPublicDomain=true&q=${adjustedQueries.met}&size=100`;
+    const searchResponse = await fetchWithRetry(metUrl);
     const searchData = await searchResponse.json();
     console.log('Metropolitan search data:', searchData);
 
@@ -174,9 +223,8 @@ export async function fetchArtwork(query = config.DEFAULT_QUERY, subcategory = '
 
     // Fallback to Harvard Museum API
     try {
-      const harvardResponse = await fetchWithRetry(
-        `${config.HARVARD_API_URL}/object?apikey=${config.HARVARD_API_KEY}&hasimage=1&size=100&q=${adjustedQueries.harvard}`
-      );
+      const harvardUrl = `${config.HARVARD_API_URL}/object?apikey=${config.HARVARD_API_KEY}&hasimage=1&size=100&q=${adjustedQueries.harvard}`;
+      const harvardResponse = await fetchWithRetry(harvardUrl);
       const harvardData = await harvardResponse.json();
       console.log('Harvard search data:', harvardData);
 
@@ -215,9 +263,8 @@ export async function fetchArtwork(query = config.DEFAULT_QUERY, subcategory = '
 
       // Fallback to National Museum of Australia API
       try {
-        const nmaResponse = await fetchWithRetry(
-          `${config.NMA_API_URL}/object?text=${adjustedQueries.nma}&hasImage=true&size=100&apiKey=${config.NMA_API_KEY}`
-        );
+        const nmaUrl = `${config.NMA_API_URL}/object?text=${adjustedQueries.nma}&size=100&apiKey=${config.NMA_API_KEY}`;
+        const nmaResponse = await fetchWithRetry(nmaUrl);
         const nmaData = await nmaResponse.json();
         console.log('NMA search data:', nmaData);
 
@@ -225,11 +272,21 @@ export async function fetchArtwork(query = config.DEFAULT_QUERY, subcategory = '
           throw new Error('No artworks found in National Museum of Australia');
         }
 
+        // Filter artworks with valid media
+        const validArtworks = nmaData.data.filter(
+          (item) => item.media && item.media[0]?.url
+        );
+        console.log('NMA valid artworks with media:', validArtworks);
+
+        if (validArtworks.length === 0) {
+          throw new Error('No artworks with valid media found in National Museum of Australia');
+        }
+
         // Try up to 3 artworks
         let artwork = null;
-        for (let i = 0; i < Math.min(3, nmaData.data.length); i++) {
-          const randomIndex = Math.floor(Math.random() * nmaData.data.length);
-          const nmaArtwork = nmaData.data[randomIndex];
+        for (let i = 0; i < Math.min(3, validArtworks.length); i++) {
+          const randomIndex = Math.floor(Math.random() * validArtworks.length);
+          const nmaArtwork = validArtworks[randomIndex];
           console.log('NMA selected artwork:', nmaArtwork);
 
           if (nmaArtwork.media && nmaArtwork.media[0]?.url) {
@@ -241,6 +298,7 @@ export async function fetchArtwork(query = config.DEFAULT_QUERY, subcategory = '
               medium: nmaArtwork.medium || 'Unknown Medium',
               source: 'National Museum of Australia',
             };
+            console.log('Valid NMA artwork found:', artwork);
             break;
           }
         }

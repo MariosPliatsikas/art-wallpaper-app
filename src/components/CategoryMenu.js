@@ -1,13 +1,13 @@
 
-// src/components/CategoryMenu.js
 import React from 'react';
 import './CategoryMenu.css';
 
 /**
  * CategoryMenu component to display a menu of artwork categories and subcategories.
  * @param {boolean} hidden - Whether the menu should be hidden (controlled by App.js)
+ * @param {function} onSelectCategory - Callback to handle category and subcategory selection
  */
-function CategoryMenu({ hidden }) {
+function CategoryMenu({ hidden, onSelectCategory }) {
   const categories = [
     {
       name: 'Period',
@@ -18,8 +18,20 @@ function CategoryMenu({ hidden }) {
       subcategories: ['Renaissance', 'Baroque', 'Impressionism', 'Modernism'],
     },
     {
+      name: 'Type',
+      subcategories: ['Painting', 'Sculpture', 'Photography'],
+    },
+    {
       name: 'Museum',
       subcategories: ['Metropolitan', 'Harvard', 'National Museum of Australia'],
+    },
+    {
+      name: 'Indigenous',
+      subcategories: ['Aboriginal Art', 'Torres Strait Islander Art'],
+    },
+    {
+      name: 'Contemporary',
+      subcategories: ['Contemporary Australian'],
     },
   ];
 
@@ -27,9 +39,9 @@ function CategoryMenu({ hidden }) {
   console.log('CategoryMenu rendered, hidden:', hidden);
   console.log('Categories available:', categories);
 
-  const handleSubcategoryClick = (subcategory) => {
-    console.log('Selected subcategory:', subcategory);
-    // Add logic to filter artworks by subcategory (e.g., update fetchArtwork query)
+  const handleSubcategoryClick = (category, subcategory) => {
+    console.log('Selected category:', category, 'subcategory:', subcategory);
+    onSelectCategory(category.toLowerCase(), subcategory);
   };
 
   return (
@@ -43,7 +55,7 @@ function CategoryMenu({ hidden }) {
                 <button
                   key={sub}
                   className="subcategory-button"
-                  onClick={() => handleSubcategoryClick(sub)}
+                  onClick={() => handleSubcategoryClick(category.name, sub)}
                 >
                   {sub}
                 </button>

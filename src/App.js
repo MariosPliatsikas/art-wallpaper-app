@@ -149,7 +149,7 @@ function App() {
           <FloatingText text={artworkToShow.objectDate} delay={16} position="bottom" />
         </>
       )}
-      <CategoryMenu hidden={hideButtons} onSelect={handleCategorySelect} />
+      <CategoryMenu hidden={hideButtons} onSelectCategory={handleCategorySelect} />
       <div className="button-container">
         <button
           className={`favorite-button ${hideButtons ? 'hidden' : 'visible'}`}

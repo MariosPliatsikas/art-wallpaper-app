@@ -10,7 +10,7 @@ const config = {
 
   // API Keys
   HARVARD_API_KEY: process.env.REACT_APP_HARVARD_API_KEY || '7d4c21d2-b09a-486f-aac2-c2313293e96a',
-  NMA_API_KEY: process.env.REACT_APP_NMA_API_KEY || 'placeholder-nma-api-key', // Replace with your NMA API key
+  NMA_API_KEY: process.env.REACT_APP_NMA_API_KEY || 'ha43Eo0iIbrzjbo8xRFo2VyfjRJkrVTs', // Replace with your NMA API key
 
   // Default query for APIs
   DEFAULT_QUERY: 'painting',
