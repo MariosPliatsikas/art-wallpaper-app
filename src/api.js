@@ -1,17 +1,60 @@
 
 import config from './config'; // Import configuration
 
+// Mock artwork for offline testing
+const mockArtwork = {
+  primaryImage: 'https://via.placeholder.com/800x600?text=Mock+Artwork',
+  title: 'Mock Artwork',
+  objectDate: '2023',
+  artistDisplayName: 'Mock Artist',
+  medium: 'Digital',
+  source: 'Mock API',
+};
+
+// Mapping subcategories to API queries (placeholder, adjust as needed)
+const subcategoryMapping = {
+  period: {
+    'Pre-1600': 'dateBegin<=1600',
+    '1600-1800': 'dateBegin>=1600&dateEnd<=1800',
+    'Post-1800': 'dateBegin>=1800',
+  },
+  movement: {
+    Impressionism: 'Impressionism',
+    Renaissance: 'Renaissance',
+    Baroque: 'Baroque',
+  },
+  museum: {
+    Metropolitan: 'source:Metropolitan',
+    Harvard: 'source:Harvard',
+  },
+};
+
 /**
  * Fetches artwork from Metropolitan Museum API with fallback to Harvard Museum API.
  * @param {string} query - Search query (default: 'painting')
+ * @param {string} subcategory - Subcategory for filtering (optional)
+ * @param {boolean} useMock - Use mock data for testing (default: false)
  * @returns {Promise<Object|null>} Artwork object or null if failed
  */
-export async function fetchArtwork(query = 'painting') {
+export async function fetchArtwork(query = 'painting', subcategory = '', useMock = false) {
+  // Return mock data if enabled
+  if (useMock) {
+    console.log('Using mock artwork');
+    return mockArtwork;
+  }
+
+  // Adjust query based on subcategory
+  let adjustedQuery = query;
+  if (subcategory && subcategoryMapping[query]?.[subcategory]) {
+    adjustedQuery = subcategoryMapping[query][subcategory];
+    console.log(`Adjusted query for subcategory ${subcategory}: ${adjustedQuery}`);
+  }
+
   // Attempt to fetch from Metropolitan Museum API
   try {
-    // Step 1: Search for artworks
+    // Step 1: Search for artworks (limit to 100 results for performance)
     const searchResponse = await fetch(
-      `${config.MET_MUSEUM_API_URL}/search?hasImages=true&q=${query}`
+      `${config.MET_MUSEUM_API_URL}/search?hasImages=true&q=${adjustedQuery}&size=100`
     );
 
     if (!searchResponse.ok) {
@@ -19,7 +62,7 @@ export async function fetchArtwork(query = 'painting') {
     }
 
     const searchData = await searchResponse.json();
-    console.log('Metropolitan search data:', searchData); // Debug response
+    console.log('Metropolitan search data:', searchData);
 
     // Check if artworks are available
     if (!searchData.objectIDs || searchData.objectIDs.length === 0) {
@@ -40,7 +83,7 @@ export async function fetchArtwork(query = 'painting') {
     }
 
     const fetchedArtwork = await artworkResponse.json();
-    console.log('Metropolitan artwork details:', fetchedArtwork); // Debug response
+    console.log('Metropolitan artwork details:', fetchedArtwork);
 
     // Validate primary image
     if (!fetchedArtwork.primaryImage || fetchedArtwork.primaryImage === '') {
@@ -62,7 +105,7 @@ export async function fetchArtwork(query = 'painting') {
     // Fallback to Harvard Museum API
     try {
       const harvardResponse = await fetch(
-        `${config.HARVARD_API_URL}/object?apikey=${config.HARVARD_API_KEY}&hasimage=1&size=100&q=${query}`
+        `${config.HARVARD_API_URL}/object?apikey=${config.HARVARD_API_KEY}&hasimage=1&size=100&q=${adjustedQuery}`
       );
 
       if (!harvardResponse.ok) {
@@ -70,7 +113,7 @@ export async function fetchArtwork(query = 'painting') {
       }
 
       const harvardData = await harvardResponse.json();
-      console.log('Harvard search data:', harvardData); // Debug response
+      console.log('Harvard search data:', harvardData);
 
       // Check if artworks are available
       if (!harvardData.records || harvardData.records.length === 0) {
@@ -80,7 +123,7 @@ export async function fetchArtwork(query = 'painting') {
       // Select random artwork
       const randomIndex = Math.floor(Math.random() * harvardData.records.length);
       const harvardArtwork = harvardData.records[randomIndex];
-      console.log('Harvard selected artwork:', harvardArtwork); // Debug response
+      console.log('Harvard selected artwork:', harvardArtwork);
 
       // Validate primary image
       if (!harvardArtwork.primaryimageurl || harvardArtwork.primaryimageurl === '') {
