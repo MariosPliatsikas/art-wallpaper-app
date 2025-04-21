@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { fetchArtwork } from './api';
 
 // Default artwork for fallback cases
@@ -15,27 +15,37 @@ const defaultArtwork = {
 /**
  * Custom hook to fetch and manage artwork data.
  * Returns artwork, loading state, error message, and refresh function.
+ * @param {string} query - Search query (default: 'painting')
+ * @param {string} subcategory - Subcategory for filtering (optional)
  */
-const useArtwork = () => {
+const useArtwork = (query = 'painting', subcategory = '') => {
   const [artwork, setArtwork] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   // Function to fetch artwork data
-  const getArtwork = async () => {
+  const getArtwork = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      const fetchedArtwork = await fetchArtwork('painting'); // Query can be customized
-      console.log('Fetched artwork in useArtwork:', fetchedArtwork); // Debug API response
+      const { artwork: fetchedArtwork, error: fetchError } = await fetchArtwork(query, subcategory);
+      console.log('Fetched artwork in useArtwork:', { artwork: fetchedArtwork, error: fetchError });
 
       // Validate fetched artwork
-      if (fetchedArtwork && fetchedArtwork.primaryImage) {
-        setArtwork(fetchedArtwork);
-      } else {
+      if (fetchError || !fetchedArtwork || !fetchedArtwork.primaryImage) {
         console.warn('No valid artwork received, using default');
-        setError('No valid artwork found. Using default artwork.');
+        setError(fetchError || 'No valid artwork found. Using default artwork.');
         setArtwork(defaultArtwork);
+      } else {
+        // Ensure all fields have fallback values
+        setArtwork({
+          primaryImage: fetchedArtwork.primaryImage,
+          title: fetchedArtwork.title || 'Untitled',
+          objectDate: fetchedArtwork.objectDate || 'Unknown Date',
+          artistDisplayName: fetchedArtwork.artistDisplayName || 'Unknown Artist',
+          medium: fetchedArtwork.medium || 'Unknown Medium',
+          source: fetchedArtwork.source || 'Unknown Source',
+        });
       }
     } catch (err) {
       console.error('Error in useArtwork:', err);
@@ -44,7 +54,7 @@ const useArtwork = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [query, subcategory]);
 
   // Fetch artwork on mount and every 10 minutes
   useEffect(() => {
@@ -58,7 +68,7 @@ const useArtwork = () => {
 
     // Cleanup interval on unmount
     return () => clearInterval(interval);
-  }, []);
+  }, [getArtwork]);
 
   // Manual refresh function
   const refresh = () => {

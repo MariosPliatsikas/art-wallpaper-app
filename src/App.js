@@ -16,7 +16,9 @@ import './App.css';
  * Displays random artworks, manages favorites, and integrates zoom functionality.
  */
 function App() {
-  const { artwork, loading, error, refresh } = useArtwork();
+  const [selectedCategory, setSelectedCategory] = useState('type');
+  const [selectedSubcategory, setSelectedSubcategory] = useState('');
+  const { artwork, loading, error, refresh } = useArtwork(selectedCategory, selectedSubcategory);
   const [showText, setShowText] = useState(false);
   const [favorites, setFavorites] = useState([]);
   const [showFavorites, setShowFavorites] = useState(false);
@@ -28,7 +30,7 @@ function App() {
   // Debug artwork, loading, error, and hideButtons states
   useEffect(() => {
     console.log('useArtwork state:', { artwork, loading, error });
-    console.log('hideButtons state:', hideButtons); // Debug CategoryMenu visibility
+    console.log('hideButtons state:', hideButtons);
   }, [artwork, loading, error, hideButtons]);
 
   // Manage UI visibility (text and buttons)
@@ -64,7 +66,7 @@ function App() {
   // Redirect if no artwork or error
   useEffect(() => {
     if (loading) return;
-    if (error || !artwork?.primaryImage) {
+    if (error && !artwork?.primaryImage) {
       console.log('Redirecting to /next-page due to:', { error, hasPrimaryImage: !!artwork?.primaryImage });
       navigate('/next-page');
     }
@@ -108,6 +110,13 @@ function App() {
     setShowCanvas(false);
   }, []);
 
+  // Handle category and subcategory selection
+  const handleCategorySelect = useCallback((category, subcategory) => {
+    setSelectedCategory(category);
+    setSelectedSubcategory(subcategory);
+    refresh();
+  }, [refresh]);
+
   const artworkToShow = selectedArtwork || artwork;
 
   // Fallback UI
@@ -140,7 +149,7 @@ function App() {
           <FloatingText text={artworkToShow.objectDate} delay={16} position="bottom" />
         </>
       )}
-      <CategoryMenu hidden={hideButtons} />
+      <CategoryMenu hidden={hideButtons} onSelect={handleCategorySelect} />
       <div className="button-container">
         <button
           className={`favorite-button ${hideButtons ? 'hidden' : 'visible'}`}
