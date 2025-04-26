@@ -1,3 +1,4 @@
+
 {
   "name": "art-wallpaper",
   "version": "0.1.0",
@@ -20,12 +21,18 @@
   "author": "Marios Pliatsikas <marios.pliatsikas@example.com>",
   "license": "MIT",
   "dependencies": {
+    "@svgr/plugin-svgo": "^8.1.0",
+    "@svgr/webpack": "^8.1.0",
     "eslint-config-react-app": "^7.0.1",
+    "nth-check": "^2.1.1",
     "openseadragon": "^5.0.1",
+    "postcss": "^8.5.3",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-router-dom": "^7.5.0",
-    "react-scripts": "^5.0.1"
+    "react-scripts": "^5.0.1",
+    "resolve-url-loader": "^5.0.0",
+    "svgo": "^3.3.2"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -56,5 +63,13 @@
   "devDependencies": {
     "eslint": "^8.0.0",
     "prettier": "^2.0.0"
+  },
+  "resolutions": {
+    "**/nth-check": "^2.1.1",
+    "**/postcss": "^8.5.3",
+    "**/svgo": "^3.3.2",
+    "**/@svgr/plugin-svgo": "^8.1.0",
+    "**/@svgr/webpack": "^8.1.0",
+    "**/resolve-url-loader": "^5.0.0"
   }
 }
