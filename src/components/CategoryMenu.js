@@ -25,14 +25,6 @@ function CategoryMenu({ hidden, onSelectCategory }) {
       name: 'Museum',
       subcategories: ['Metropolitan', 'Harvard', 'National Museum of Australia'],
     },
-    {
-      name: 'Indigenous',
-      subcategories: ['Aboriginal Art', 'Torres Strait Islander Art'],
-    },
-    {
-      name: 'Contemporary',
-      subcategories: ['Contemporary Australian'],
-    },
   ];
 
   // Debug rendering and hidden state
