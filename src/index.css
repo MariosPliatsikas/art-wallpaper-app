@@ -1,6 +1,11 @@
 
 /* src/index.css */
 
+/* Ensure Roboto is applied globally to all elements */
+* {
+  font-family: 'Roboto', sans-serif !important;
+}
+
 /* Global styles for the Art Wallpaper App */
 html, body {
   margin: 0;
@@ -8,9 +13,8 @@ html, body {
   width: 100%;
   height: 100%;
   overflow-y: auto; /* Allow vertical scrolling */
-  font-family: 'Dancing Script', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-  font-size: 16px; /* Base font size */
+  font-family: 'Roboto', sans-serif; /* Already set globally, but kept for clarity */
+  font-size: 18px; /* Increased base font size for better readability */
   padding-top: env(safe-area-inset-top); /* Safe area for mobile devices */
   padding-bottom: env(safe-area-inset-bottom);
   padding-left: env(safe-area-inset-left);
@@ -26,8 +30,9 @@ html, body {
   position: absolute;
   top: 50px; /* Adjusted to balance larger font */
   left: 25px;
-  font-family: 'Dancing Script', cursive;
-  font-size: 48px; /* Larger font size */
+  font-family: 'Roboto', sans-serif; /* Already set globally, but kept for clarity */
+  font-weight: 700; /* Bold weight for emphasis */
+  font-size: 56px; /* Increased font size for desktop */
   color: #b4b2b2;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
   z-index: 999; /* Below .category-menu (z-index: 1000) */
@@ -63,11 +68,12 @@ button {
   background: linear-gradient(to right, #3f322d, #483027); /* Gradient background */
   color: #fff;
   border: none;
-  padding: 10px 20px;
+  padding: 12px 24px; /* Increased padding for larger buttons */
   border-radius: 5px;
   cursor: pointer;
-  font-size: 1rem;
-  font-family: 'Dancing Script', cursive;
+  font-size: 1.2rem; /* Increased font size for buttons */
+  font-family: 'Roboto', sans-serif; /* Already set globally, but kept for clarity */
+  font-weight: 500; /* Medium weight for buttons */
   transition: all 0.3s ease;
 }
 
@@ -79,19 +85,24 @@ button:focus {
   outline-offset: 2px;
 }
 
+/* Code elements */
+code {
+  font-family: 'Roboto', sans-serif; /* Use Roboto instead of source-code-pro */
+}
+
 /* Responsive styles for tablets */
 @media (max-width: 768px) {
   html, body {
-    font-size: 14px; /* Smaller font size for tablets */
+    font-size: 16px; /* Increased font size for tablets */
   }
 
   button {
-    font-size: 0.9rem;
-    padding: 8px 16px;
+    font-size: 1rem; /* Increased font size for tablet buttons */
+    padding: 10px 20px; /* Adjusted padding */
   }
 
   .app-title {
-    font-size: 40px; /* Larger font for tablets */
+    font-size: 48px; /* Increased font size for tablets */
     top: 45px;
   }
 }
@@ -99,16 +110,16 @@ button:focus {
 /* Responsive styles for small screens */
 @media (max-width: 480px) {
   html, body {
-    font-size: 12px; /* Smallest font size for mobile */
+    font-size: 14px; /* Increased font size for mobile */
   }
 
   button {
-    font-size: 0.8rem;
-    padding: 6px 12px;
+    font-size: 0.9rem; /* Increased font size for mobile buttons */
+    padding: 8px 16px; /* Adjusted padding */
   }
 
   .app-title {
-    font-size: 34px; /* Larger font for mobile */
+    font-size: 40px; /* Increased font size for mobile */
     top: 40px;
   }
 }

@@ -41,7 +41,7 @@ function App() {
     // Hide text after 10 seconds
     const hideTextTimer = showText ? setTimeout(() => setShowText(false), 10000) : null;
 
-    // Show buttons on mouse move/touch and hide after 5 seconds
+    // Show buttons and title on mouse move/touch and hide after 5 seconds
     let hideButtonsTimeout;
     const showButtons = () => {
       setHideButtons(false);
@@ -142,6 +142,10 @@ function App() {
         backgroundSize: 'contain',
       }}
     >
+      {/* Add the app title with hide/show behavior */}
+      <div className={`app-title ${hideButtons ? 'hidden' : 'visible'}`} id="appTitle">
+        Art Wallpaper App
+      </div>
       <ArtworkInfo artwork={artworkToShow} />
       {showText && (
         <>
