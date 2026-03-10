@@ -65,9 +65,11 @@
     "prettier": "^2.0.0"
   },
   "resolutions": {
+    "underscore": "^1.13.7",
     "**/nth-check": "^2.1.1",
     "**/postcss": "^8.5.3",
-    "**/svgo": "^3.3.2",
+    "svgo": "^3.3.3",
+    "rollup": "^4.22.4",
     "**/@svgr/plugin-svgo": "^8.1.0",
     "**/@svgr/webpack": "^8.1.0",
     "**/resolve-url-loader": "^5.0.0"
