@@ -1,7 +1,10 @@
 import React from 'react';
+import { getMuseumOptions } from '../services/museums/museumRegistry';
 import './CategoryMenu.css';
 
 function CategoryMenu({ hidden, onSelectCategory }) {
+  const museumNames = getMuseumOptions().map(({ name }) => name);
+
   const categories = [
     {
       name: 'Period',
@@ -17,7 +20,7 @@ function CategoryMenu({ hidden, onSelectCategory }) {
     },
     {
       name: 'Museum',
-      subcategories: ['Metropolitan', 'Cleveland Museum of Art'],
+      subcategories: museumNames,
     },
   ];
 
