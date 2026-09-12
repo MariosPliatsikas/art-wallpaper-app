@@ -27,6 +27,11 @@ jobs:
         env:
           CI: true
 
+      - name: Check public museum APIs
+        run: |
+          curl --fail --silent --show-error "https://collectionapi.metmuseum.org/public/collection/v1.1/search?hasImages=true&isPublicDomain=true&q=painting&limit=1" > /dev/null
+          curl --fail --silent --show-error "https://openaccess-api.clevelandart.org/api/artworks/?has_image=1&limit=1" > /dev/null
+
       - name: Production build
         run: yarn build
         env:
