@@ -1,5 +1,4 @@
 import { useEffect, useState, useCallback } from 'react';
-import { fetchArtwork } from './api';
 import getRandomArtwork from './services/museums/artworkService';
 import toLegacyArtwork from './services/museums/artworkAdapter';
 
@@ -21,16 +20,60 @@ const museumIdByLabel = {
   Harvard: 'harvard',
 };
 
-const typeQueryByLabel = {
-  Painting: 'painting',
-  Sculpture: 'sculpture',
-  Photography: 'photography',
+const typeByLabel = {
+  Painting: 'Painting',
+  Sculpture: 'Sculpture',
+  Photography: 'Photography',
 };
 
+const periodByLabel = {
+  'Pre-1600': { dateBegin: 0, dateEnd: 1599 },
+  '1600-1800': { dateBegin: 1600, dateEnd: 1800 },
+  '1800-1900': { dateBegin: 1800, dateEnd: 1900 },
+  '1900-Present': { dateBegin: 1900, dateEnd: new Date().getFullYear() },
+};
+
+const movements = new Set(['Renaissance', 'Baroque', 'Impressionism', 'Modernism']);
+
+function buildArtworkRequest(query, subcategory) {
+  if (query === 'random') {
+    return { filters: { type: 'Painting' } };
+  }
+
+  if (query === 'museum' && museumIdByLabel[subcategory]) {
+    return {
+      museumId: museumIdByLabel[subcategory],
+      filters: { type: 'Painting' },
+    };
+  }
+
+  if (query === 'type' && typeByLabel[subcategory]) {
+    return { filters: { type: typeByLabel[subcategory] } };
+  }
+
+  if (query === 'period' && periodByLabel[subcategory]) {
+    return {
+      filters: {
+        type: 'Painting',
+        ...periodByLabel[subcategory],
+      },
+    };
+  }
+
+  if (query === 'movement' && movements.has(subcategory)) {
+    return {
+      filters: {
+        type: 'Painting',
+        movement: subcategory,
+      },
+    };
+  }
+
+  return { query: subcategory || 'art' };
+}
+
 /**
- * Custom hook to fetch and manage artwork data.
- * Random, museum, and type selections use the new provider architecture.
- * Period and movement filters still use the legacy API layer until migrated.
+ * Custom hook backed by the unified museum provider system.
  */
 const useArtwork = (query = 'random', subcategory = '') => {
   const [artwork, setArtwork] = useState(null);
@@ -42,31 +85,11 @@ const useArtwork = (query = 'random', subcategory = '') => {
       setLoading(true);
       setError(null);
 
-      let fetchedArtwork = null;
-      let fetchError = null;
+      const normalizedArtwork = await getRandomArtwork(buildArtworkRequest(query, subcategory));
+      const fetchedArtwork = toLegacyArtwork(normalizedArtwork);
 
-      if (query === 'random') {
-        const normalizedArtwork = await getRandomArtwork({ query: 'painting' });
-        fetchedArtwork = toLegacyArtwork(normalizedArtwork);
-      } else if (query === 'museum' && museumIdByLabel[subcategory]) {
-        const normalizedArtwork = await getRandomArtwork({
-          museumId: museumIdByLabel[subcategory],
-          query: 'painting',
-        });
-        fetchedArtwork = toLegacyArtwork(normalizedArtwork);
-      } else if (query === 'type' && typeQueryByLabel[subcategory]) {
-        const normalizedArtwork = await getRandomArtwork({
-          query: typeQueryByLabel[subcategory],
-        });
-        fetchedArtwork = toLegacyArtwork(normalizedArtwork);
-      } else {
-        const legacyResult = await fetchArtwork(query, subcategory);
-        fetchedArtwork = legacyResult.artwork;
-        fetchError = legacyResult.error;
-      }
-
-      if (fetchError || !fetchedArtwork || !fetchedArtwork.primaryImage) {
-        setError(fetchError || 'No valid artwork found. Using default artwork.');
+      if (!fetchedArtwork?.primaryImage) {
+        setError('No valid artwork found. Using default artwork.');
         setArtwork(defaultArtwork);
         return;
       }
