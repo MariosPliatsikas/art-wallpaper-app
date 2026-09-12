@@ -21,10 +21,16 @@ const museumIdByLabel = {
   Harvard: 'harvard',
 };
 
+const typeQueryByLabel = {
+  Painting: 'painting',
+  Sculpture: 'sculpture',
+  Photography: 'photography',
+};
+
 /**
  * Custom hook to fetch and manage artwork data.
- * Random and museum-specific selections use the new provider architecture.
- * Other filters still use the legacy API layer until their migration is complete.
+ * Random, museum, and type selections use the new provider architecture.
+ * Period and movement filters still use the legacy API layer until migrated.
  */
 const useArtwork = (query = 'random', subcategory = '') => {
   const [artwork, setArtwork] = useState(null);
@@ -46,6 +52,11 @@ const useArtwork = (query = 'random', subcategory = '') => {
         const normalizedArtwork = await getRandomArtwork({
           museumId: museumIdByLabel[subcategory],
           query: 'painting',
+        });
+        fetchedArtwork = toLegacyArtwork(normalizedArtwork);
+      } else if (query === 'type' && typeQueryByLabel[subcategory]) {
+        const normalizedArtwork = await getRandomArtwork({
+          query: typeQueryByLabel[subcategory],
         });
         fetchedArtwork = toLegacyArtwork(normalizedArtwork);
       } else {
