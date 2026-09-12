@@ -1,10 +1,10 @@
-
 import { useEffect, useState, useCallback } from 'react';
 import { fetchArtwork } from './api';
+import getRandomArtwork from './services/museums/artworkService';
+import toLegacyArtwork from './services/museums/artworkAdapter';
 
-// Default artwork for fallback cases
 const defaultArtwork = {
-  primaryImage: '/images/fallback-artwork.png', // Ensure this file exists in public/images
+  primaryImage: '/images/fallback-artwork.png',
   title: 'Default Artwork',
   objectDate: 'Unknown',
   artistDisplayName: 'Unknown Artist',
@@ -12,50 +12,60 @@ const defaultArtwork = {
   source: 'Fallback',
 };
 
+const museumIdByLabel = {
+  Metropolitan: 'met',
+  'The Metropolitan Museum of Art': 'met',
+  Cleveland: 'cleveland',
+  'Cleveland Museum of Art': 'cleveland',
+};
+
 /**
  * Custom hook to fetch and manage artwork data.
- * Returns artwork, loading state, error message, and refresh function.
- * @param {string} query - Search query (default: 'painting')
- * @param {string} subcategory - Subcategory for filtering (optional)
+ * Museum selections use the new provider architecture; other filters still use
+ * the legacy API layer until their migration is complete.
  */
 const useArtwork = (query = 'painting', subcategory = '') => {
   const [artwork, setArtwork] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Function to fetch artwork data
   const getArtwork = useCallback(async () => {
-    console.log('getArtwork called with:', { query, subcategory });
     try {
       setLoading(true);
       setError(null);
-      const { artwork: fetchedArtwork, error: fetchError } = await fetchArtwork(query, subcategory);
-      console.log('Fetched artwork in useArtwork:', { artwork: fetchedArtwork, error: fetchError });
 
-      // Validate fetched artwork
-      if (fetchError || !fetchedArtwork || !fetchedArtwork.primaryImage) {
-        console.warn('No valid artwork received, using default. Details:', {
-          fetchError,
-          fetchedArtwork,
-          hasPrimaryImage: fetchedArtwork?.primaryImage,
+      let fetchedArtwork = null;
+      let fetchError = null;
+
+      if (query === 'museum' && museumIdByLabel[subcategory]) {
+        const normalizedArtwork = await getRandomArtwork({
+          museumId: museumIdByLabel[subcategory],
+          query: 'painting',
         });
+        fetchedArtwork = toLegacyArtwork(normalizedArtwork);
+      } else {
+        const legacyResult = await fetchArtwork(query, subcategory);
+        fetchedArtwork = legacyResult.artwork;
+        fetchError = legacyResult.error;
+      }
+
+      if (fetchError || !fetchedArtwork || !fetchedArtwork.primaryImage) {
         setError(fetchError || 'No valid artwork found. Using default artwork.');
         setArtwork(defaultArtwork);
-      } else {
-        // Ensure all fields have fallback values
-        const validatedArtwork = {
-          primaryImage: fetchedArtwork.primaryImage,
-          title: fetchedArtwork.title || 'Untitled',
-          objectDate: fetchedArtwork.objectDate || 'Unknown Date',
-          artistDisplayName: fetchedArtwork.artistDisplayName || 'Unknown Artist',
-          medium: fetchedArtwork.medium || 'Unknown Medium',
-          source: fetchedArtwork.source || 'Unknown Source',
-        };
-        console.log('Setting validated artwork:', validatedArtwork);
-        setArtwork(validatedArtwork);
+        return;
       }
+
+      setArtwork({
+        ...fetchedArtwork,
+        primaryImage: fetchedArtwork.primaryImage,
+        title: fetchedArtwork.title || 'Untitled',
+        objectDate: fetchedArtwork.objectDate || 'Unknown Date',
+        artistDisplayName: fetchedArtwork.artistDisplayName || 'Unknown Artist',
+        medium: fetchedArtwork.medium || 'Unknown Medium',
+        source: fetchedArtwork.source || 'Unknown Source',
+      });
     } catch (err) {
-      console.error('Error in useArtwork:', err.message, err.stack);
+      console.error('Error in useArtwork:', err);
       setError(err.message || 'Something went wrong. Please refresh the page.');
       setArtwork(defaultArtwork);
     } finally {
@@ -63,25 +73,15 @@ const useArtwork = (query = 'painting', subcategory = '') => {
     }
   }, [query, subcategory]);
 
-  // Fetch artwork on mount and every 10 minutes
   useEffect(() => {
     getArtwork();
-
-    // Set interval to refresh every 10 minutes
-    const interval = setInterval(() => {
-      console.log('Refreshing artwork via interval');
-      getArtwork();
-    }, 600000); // 10 minutes in milliseconds
-
-    // Cleanup interval on unmount
+    const interval = setInterval(getArtwork, 600000);
     return () => clearInterval(interval);
   }, [getArtwork]);
 
-  // Manual refresh function
-  const refresh = () => {
-    console.log('Manual refresh triggered');
+  const refresh = useCallback(() => {
     getArtwork();
-  };
+  }, [getArtwork]);
 
   return { artwork, loading, error, refresh };
 };
