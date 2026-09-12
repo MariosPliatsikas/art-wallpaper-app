@@ -109,11 +109,17 @@ img { max-width: 100%; height: auto; }
   .fallback { font-size: 1.5rem; }
 }
 
+/* Desktop artwork-first mode: metadata appears only after clicking the artwork. */
+@media (min-width: 769px) and (pointer: fine) {
+  .artwork-info { opacity: 0; pointer-events: none; }
+  .artwork-info-visible .artwork-info { opacity: 1; pointer-events: auto; }
+}
+
 /* Artwork-first mobile landscape. Metadata is hidden until the user taps the artwork. */
 @media (orientation: landscape) and (max-height: 500px) and (pointer: coarse) {
   .artwork-info { opacity: 0; pointer-events: none; max-width: min(300px, 42vw); font-size: .82rem; bottom: 12px; left: 12px; }
-  .mobile-info-visible .artwork-info { opacity: 1; pointer-events: auto; }
-  .mobile-info-visible .artwork-info .artist-name { font-size: 1rem; }
+  .artwork-info-visible .artwork-info { opacity: 1; pointer-events: auto; }
+  .artwork-info-visible .artwork-info .artist-name { font-size: 1rem; }
   .floating-text { display: none; }
   .category-menu { top: 12px; left: 12px; flex-direction: row; gap: 6px; }
   .category-button, .favorite-button, .favorites-toggle { font-size: .8rem; padding: 5px 9px; }
