@@ -27,18 +27,27 @@ function normalizeClevelandArtwork(item) {
   });
 }
 
-/**
- * Fetch a random Cleveland Museum of Art object that has an image.
- * The Open Access API does not require an API key.
- */
-export async function getRandomClevelandArtwork(query = '') {
+function toSearchOptions(input = {}) {
+  if (typeof input === 'string') return { query: input };
+  return input || {};
+}
+
+export async function getRandomClevelandArtwork(input = {}) {
+  const { query, type, movement, dateBegin, dateEnd } = toSearchOptions(input);
   const params = new URLSearchParams({
     has_image: '1',
     limit: '100',
   });
 
-  if (query) {
-    params.set('q', query);
+  if (type) params.set('type', type);
+  if (movement) params.set('q', movement);
+  else if (query) params.set('q', query);
+
+  if (Number.isFinite(dateBegin)) {
+    params.set('created_after', String(dateBegin - 1));
+  }
+  if (Number.isFinite(dateEnd)) {
+    params.set('created_before', String(dateEnd + 1));
   }
 
   const data = await fetchJson(`${API_URL}?${params.toString()}`);
