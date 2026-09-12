@@ -13,10 +13,12 @@ const defaultArtwork = {
 };
 
 const museumIdByLabel = {
-  Metropolitan: 'met',
   'The Metropolitan Museum of Art': 'met',
-  Cleveland: 'cleveland',
+  Metropolitan: 'met',
   'Cleveland Museum of Art': 'cleveland',
+  Cleveland: 'cleveland',
+  'Harvard Art Museums': 'harvard',
+  Harvard: 'harvard',
 };
 
 /**
