@@ -23,10 +23,10 @@ const museumIdByLabel = {
 
 /**
  * Custom hook to fetch and manage artwork data.
- * Museum selections use the new provider architecture; other filters still use
- * the legacy API layer until their migration is complete.
+ * Random and museum-specific selections use the new provider architecture.
+ * Other filters still use the legacy API layer until their migration is complete.
  */
-const useArtwork = (query = 'painting', subcategory = '') => {
+const useArtwork = (query = 'random', subcategory = '') => {
   const [artwork, setArtwork] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -39,7 +39,10 @@ const useArtwork = (query = 'painting', subcategory = '') => {
       let fetchedArtwork = null;
       let fetchError = null;
 
-      if (query === 'museum' && museumIdByLabel[subcategory]) {
+      if (query === 'random') {
+        const normalizedArtwork = await getRandomArtwork({ query: 'painting' });
+        fetchedArtwork = toLegacyArtwork(normalizedArtwork);
+      } else if (query === 'museum' && museumIdByLabel[subcategory]) {
         const normalizedArtwork = await getRandomArtwork({
           museumId: museumIdByLabel[subcategory],
           query: 'painting',
