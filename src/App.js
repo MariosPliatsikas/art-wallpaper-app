@@ -17,6 +17,7 @@ function App() {
   const [favorites, setFavorites] = useState([]);
   const [showFavorites, setShowFavorites] = useState(false);
   const [selectedArtwork, setSelectedArtwork] = useState(null);
+  const [zoomArtwork, setZoomArtwork] = useState(null);
   const [hideButtons, setHideButtons] = useState(false);
   const [showCanvas, setShowCanvas] = useState(false);
   const [artworkInfoVisible, setArtworkInfoVisible] = useState(false);
@@ -49,15 +50,15 @@ function App() {
   useEffect(() => () => clearTimeout(artworkInfoTimerRef.current), []);
 
   useEffect(() => {
-    if (showCanvas && selectedArtwork?.primaryImage) {
+    if (showCanvas && zoomArtwork?.primaryImage) {
       const viewer = OpenSeadragon({
         id: 'openseadragon-canvas',
         prefixUrl: '/node_modules/openseadragon/images/',
-        tileSources: { type: 'image', url: selectedArtwork.primaryImage },
+        tileSources: { type: 'image', url: zoomArtwork.primaryImage },
       });
       return () => viewer.destroy();
     }
-  }, [showCanvas, selectedArtwork]);
+  }, [showCanvas, zoomArtwork]);
 
   const isArtworkFirstMode = useCallback(() => {
     const desktop = window.matchMedia('(min-width: 769px) and (pointer: fine)').matches;
@@ -93,6 +94,7 @@ function App() {
 
   const handleSelectFavorite = useCallback((item) => {
     setSelectedArtwork(item);
+    setZoomArtwork(item);
     setShowFavorites(false);
     setShowCanvas(true);
   }, []);
@@ -102,7 +104,10 @@ function App() {
     setFavorites([]);
   }, []);
 
-  const handleExitCanvas = useCallback(() => setShowCanvas(false), []);
+  const handleExitCanvas = useCallback(() => {
+    setShowCanvas(false);
+    setZoomArtwork(null);
+  }, []);
 
   const handleCategorySelect = useCallback((category, subcategory) => {
     setSelectedArtwork(null);
@@ -113,6 +118,14 @@ function App() {
   }, []);
 
   const artworkToShow = selectedArtwork || artwork;
+
+  const handleZoomCurrentArtwork = useCallback(() => {
+    if (!artworkToShow?.primaryImage) return;
+    setZoomArtwork(artworkToShow);
+    setArtworkInfoVisible(false);
+    clearTimeout(artworkInfoTimerRef.current);
+    setShowCanvas(true);
+  }, [artworkToShow]);
 
   if (loading) return <div className="fallback">Loading...</div>;
 
@@ -156,6 +169,16 @@ function App() {
       </div>
       {showFavorites && (
         <FavoritesList favorites={favorites} onSelectFavorite={handleSelectFavorite} onClearFavorites={handleClearFavorites} />
+      )}
+      {!showCanvas && (
+        <button
+          className={`desktop-zoom-button ${hideButtons ? 'hidden' : 'visible'}`}
+          onClick={handleZoomCurrentArtwork}
+          aria-label="Zoom artwork"
+          title="Zoom artwork"
+        >
+          🔍 Zoom
+        </button>
       )}
       {showCanvas && (
         <>
