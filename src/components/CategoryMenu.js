@@ -1,12 +1,6 @@
-
 import React from 'react';
 import './CategoryMenu.css';
 
-/**
- * CategoryMenu component to display a menu of artwork categories and subcategories.
- * @param {boolean} hidden - Whether the menu should be hidden (controlled by App.js)
- * @param {function} onSelectCategory - Callback to handle category and subcategory selection
- */
 function CategoryMenu({ hidden, onSelectCategory }) {
   const categories = [
     {
@@ -23,41 +17,32 @@ function CategoryMenu({ hidden, onSelectCategory }) {
     },
     {
       name: 'Museum',
-      subcategories: ['Metropolitan', 'Harvard', 'National Museum of Australia'],
+      subcategories: ['Metropolitan', 'Cleveland Museum of Art'],
     },
   ];
 
-  // Debug rendering and hidden state
-  console.log('CategoryMenu rendered, hidden:', hidden);
-  console.log('Categories available:', categories);
-
   const handleSubcategoryClick = (category, subcategory) => {
-    console.log('Selected category:', category, 'subcategory:', subcategory);
     onSelectCategory(category.toLowerCase(), subcategory);
   };
 
   return (
     <div className={`category-menu ${hidden ? 'hidden' : 'visible'}`}>
-      {categories.length > 0 ? (
-        categories.map((category) => (
-          <div key={category.name} className="category-item">
-            <button className="category-button">{category.name}</button>
-            <div className="subcategory-menu">
-              {category.subcategories.map((sub) => (
-                <button
-                  key={sub}
-                  className="subcategory-button"
-                  onClick={() => handleSubcategoryClick(category.name, sub)}
-                >
-                  {sub}
-                </button>
-              ))}
-            </div>
+      {categories.map((category) => (
+        <div key={category.name} className="category-item">
+          <button className="category-button">{category.name}</button>
+          <div className="subcategory-menu">
+            {category.subcategories.map((sub) => (
+              <button
+                key={sub}
+                className="subcategory-button"
+                onClick={() => handleSubcategoryClick(category.name, sub)}
+              >
+                {sub}
+              </button>
+            ))}
           </div>
-        ))
-      ) : (
-        <p>No categories available</p>
-      )}
+        </div>
+      ))}
     </div>
   );
 }
