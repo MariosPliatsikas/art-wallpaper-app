@@ -2,15 +2,6 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import getRandomArtwork from './services/museums/artworkService';
 import toLegacyArtwork from './services/museums/artworkAdapter';
 
-const defaultArtwork = {
-  primaryImage: '/images/fallback-artwork.png',
-  title: 'Default Artwork',
-  objectDate: 'Unknown',
-  artistDisplayName: 'Unknown Artist',
-  medium: 'Unknown Medium',
-  source: 'Fallback',
-};
-
 const museumIdByLabel = {
   'The Metropolitan Museum of Art': 'met',
   Metropolitan: 'met',
@@ -106,8 +97,8 @@ const useArtwork = (query = 'random', subcategory = '') => {
       const fetchedArtwork = toLegacyArtwork(normalizedArtwork);
 
       if (!fetchedArtwork?.primaryImage) {
-        setError('No valid artwork found. Using default artwork.');
-        setArtwork(defaultArtwork);
+        setArtwork(null);
+        setError('No artwork with a usable image was found. Please try again.');
         return;
       }
 
@@ -124,8 +115,12 @@ const useArtwork = (query = 'random', subcategory = '') => {
       });
     } catch (err) {
       console.error('Error in useArtwork:', err);
-      setError(err.message || 'Something went wrong. Please refresh the page.');
-      setArtwork(defaultArtwork);
+      setArtwork(null);
+      setError(
+        typeof navigator !== 'undefined' && !navigator.onLine
+          ? 'You are offline. Reconnect to the internet and try again.'
+          : 'Unable to load artwork right now. Please try again.'
+      );
     } finally {
       setLoading(false);
     }
