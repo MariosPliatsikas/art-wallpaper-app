@@ -37,7 +37,7 @@ export async function getRandomClevelandArtwork(query = '') {
     limit: '100',
   });
 
-  if (query && query !== 'painting') {
+  if (query) {
     params.set('q', query);
   }
 
