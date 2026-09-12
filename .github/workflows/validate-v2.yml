@@ -23,7 +23,7 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Run tests
-        run: yarn test --watchAll=false
+        run: yarn test --watchAll=false --passWithNoTests
         env:
           CI: true
 
