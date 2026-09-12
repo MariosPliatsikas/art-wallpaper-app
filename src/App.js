@@ -127,6 +127,10 @@ function App() {
     setShowCanvas(true);
   }, [artworkToShow]);
 
+  const isDesktopZoomAvailable =
+    typeof window !== 'undefined' &&
+    window.matchMedia('(min-width: 769px) and (pointer: fine)').matches;
+
   if (loading) return <div className="fallback">Loading...</div>;
 
   if (!artworkToShow?.primaryImage) {
@@ -170,12 +174,27 @@ function App() {
       {showFavorites && (
         <FavoritesList favorites={favorites} onSelectFavorite={handleSelectFavorite} onClearFavorites={handleClearFavorites} />
       )}
-      {!showCanvas && (
+      {!showCanvas && isDesktopZoomAvailable && (
         <button
-          className={`desktop-zoom-button ${hideButtons ? 'hidden' : 'visible'}`}
           onClick={handleZoomCurrentArtwork}
           aria-label="Zoom artwork"
           title="Zoom artwork"
+          style={{
+            position: 'absolute',
+            right: '20px',
+            bottom: '90px',
+            zIndex: 1000,
+            opacity: hideButtons ? 0 : 1,
+            pointerEvents: hideButtons ? 'none' : 'auto',
+            padding: '10px 14px',
+            borderRadius: '18px',
+            border: '2px solid rgba(255,255,255,0.5)',
+            background: 'rgba(255,255,255,0.3)',
+            color: 'white',
+            cursor: 'pointer',
+            fontSize: '16px',
+            transition: 'opacity 3s ease, background 0.3s ease',
+          }}
         >
           🔍 Zoom
         </button>
