@@ -27,17 +27,40 @@ function normalizeHarvardArtwork(item) {
   });
 }
 
-export async function getRandomHarvardArtwork(query = 'painting') {
+function toSearchOptions(input = {}) {
+  if (typeof input === 'string') return { query: input };
+  return input || {};
+}
+
+function classificationForType(type) {
+  const map = {
+    Painting: 'Paintings',
+    Sculpture: 'Sculpture',
+    Photography: 'Photographs',
+  };
+  return map[type] || type;
+}
+
+export async function getRandomHarvardArtwork(input = {}) {
   if (!config.HARVARD_API_KEY) {
     throw new Error('Harvard API key is not configured');
   }
 
+  const { query, type, movement, dateBegin, dateEnd } = toSearchOptions(input);
   const params = new URLSearchParams({
     apikey: config.HARVARD_API_KEY,
     hasimage: '1',
     size: '100',
-    q: query,
+    sort: 'random',
   });
+
+  if (type) params.set('classification', classificationForType(type));
+  if (movement) params.set('keyword', movement);
+  else if (query) params.set('q', query);
+
+  if (Number.isFinite(dateBegin) && Number.isFinite(dateEnd)) {
+    params.set('yearmade', `${dateBegin}-${dateEnd}`);
+  }
 
   const data = await fetchJson(`${config.HARVARD_API_URL}/object?${params.toString()}`);
   const records = (data.records || []).filter((item) => item.primaryimageurl);
