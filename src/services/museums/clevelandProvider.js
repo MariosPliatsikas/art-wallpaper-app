@@ -3,6 +3,13 @@ import normalizeArtwork from './normalizeArtwork';
 const MUSEUM_NAME = 'Cleveland Museum of Art';
 const API_URL = 'https://openaccess-api.clevelandart.org/api/artworks/';
 
+const movementSearchTerms = {
+  Renaissance: 'renaissance',
+  Baroque: 'baroque',
+  Impressionism: 'impressionism',
+  Modernism: 'modern',
+};
+
 async function fetchJson(url) {
   const response = await fetch(url);
   if (!response.ok) {
@@ -40,7 +47,7 @@ export async function getRandomClevelandArtwork(input = {}) {
   });
 
   if (type) params.set('type', type);
-  if (movement) params.set('q', movement);
+  if (movement) params.set('q', movementSearchTerms[movement] || movement);
   else if (query) params.set('q', query);
 
   if (Number.isFinite(dateBegin)) {
