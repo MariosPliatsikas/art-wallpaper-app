@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import useArtwork from './useArtwork';
 import ArtworkInfo from './ArtworkInfo';
 import FloatingText from './components/FloatingText/FloatingText';
@@ -9,10 +9,6 @@ import { saveFavorite, getFavorites, clearFavorites } from './database';
 import OpenSeadragon from 'openseadragon';
 import './App.css';
 
-/**
- * Main component of Art Wallpaper Museum.
- * Displays random artworks, manages favorites, and integrates zoom functionality.
- */
 function App() {
   const [selectedCategory, setSelectedCategory] = useState('random');
   const [selectedSubcategory, setSelectedSubcategory] = useState('');
@@ -23,6 +19,8 @@ function App() {
   const [selectedArtwork, setSelectedArtwork] = useState(null);
   const [hideButtons, setHideButtons] = useState(false);
   const [showCanvas, setShowCanvas] = useState(false);
+  const [mobileInfoVisible, setMobileInfoVisible] = useState(false);
+  const mobileInfoTimerRef = useRef(null);
 
   useEffect(() => {
     const textTimer = setTimeout(() => setShowText(true), 15000);
@@ -48,6 +46,8 @@ function App() {
     };
   }, [showText]);
 
+  useEffect(() => () => clearTimeout(mobileInfoTimerRef.current), []);
+
   useEffect(() => {
     if (showCanvas && selectedArtwork?.primaryImage) {
       const viewer = OpenSeadragon({
@@ -58,6 +58,24 @@ function App() {
       return () => viewer.destroy();
     }
   }, [showCanvas, selectedArtwork]);
+
+  const isMobileLandscape = useCallback(() => {
+    return window.matchMedia('(orientation: landscape) and (max-height: 500px) and (pointer: coarse)').matches;
+  }, []);
+
+  const handleArtworkTap = useCallback((event) => {
+    if (!isMobileLandscape() || showCanvas) return;
+    if (event.target.closest('button, a, .category-menu, .favorites-list')) return;
+
+    clearTimeout(mobileInfoTimerRef.current);
+    setMobileInfoVisible((visible) => {
+      const nextVisible = !visible;
+      if (nextVisible) {
+        mobileInfoTimerRef.current = setTimeout(() => setMobileInfoVisible(false), 7000);
+      }
+      return nextVisible;
+    });
+  }, [isMobileLandscape, showCanvas]);
 
   const addToFavorites = useCallback((item) => {
     setFavorites((prev) => [...prev, item]);
@@ -80,21 +98,18 @@ function App() {
     setFavorites([]);
   }, []);
 
-  const handleExitCanvas = useCallback(() => {
-    setShowCanvas(false);
-  }, []);
+  const handleExitCanvas = useCallback(() => setShowCanvas(false), []);
 
   const handleCategorySelect = useCallback((category, subcategory) => {
     setSelectedArtwork(null);
+    setMobileInfoVisible(false);
     setSelectedCategory(category);
     setSelectedSubcategory(subcategory);
   }, []);
 
   const artworkToShow = selectedArtwork || artwork;
 
-  if (loading) {
-    return <div className="fallback">Loading...</div>;
-  }
+  if (loading) return <div className="fallback">Loading...</div>;
 
   if (!artworkToShow?.primaryImage) {
     return (
@@ -107,7 +122,8 @@ function App() {
 
   return (
     <div
-      className="App"
+      className={`App ${mobileInfoVisible ? 'mobile-info-visible' : ''}`}
+      onClick={handleArtworkTap}
       style={{
         backgroundImage: `url(${artworkToShow.primaryImage})`,
         backgroundPosition: 'center',
@@ -126,41 +142,20 @@ function App() {
       )}
       <CategoryMenu hidden={hideButtons} onSelectCategory={handleCategorySelect} />
       <div className="button-container">
-        <button
-          className={`favorite-button ${hideButtons ? 'hidden' : 'visible'}`}
-          onClick={() => addToFavorites(artworkToShow)}
-        >
+        <button className={`favorite-button ${hideButtons ? 'hidden' : 'visible'}`} onClick={() => addToFavorites(artworkToShow)}>
           ❤️ Favorite
         </button>
-        <button
-          className={`favorites-toggle ${hideButtons ? 'hidden' : 'visible'}`}
-          onClick={toggleFavorites}
-        >
+        <button className={`favorites-toggle ${hideButtons ? 'hidden' : 'visible'}`} onClick={toggleFavorites}>
           Show Favorites
         </button>
       </div>
       {showFavorites && (
-        <FavoritesList
-          favorites={favorites}
-          onSelectFavorite={handleSelectFavorite}
-          onClearFavorites={handleClearFavorites}
-        />
+        <FavoritesList favorites={favorites} onSelectFavorite={handleSelectFavorite} onClearFavorites={handleClearFavorites} />
       )}
       {showCanvas && (
         <>
-          <div
-            id="openseadragon-canvas"
-            style={{
-              width: '100%',
-              height: '100%',
-              position: 'absolute',
-              top: 0,
-              left: 0,
-            }}
-          />
-          <button className="exit-canvas-button" onClick={handleExitCanvas}>
-            Exit
-          </button>
+          <div id="openseadragon-canvas" style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }} />
+          <button className="exit-canvas-button" onClick={handleExitCanvas}>Exit</button>
         </>
       )}
       <RefreshButton hidden={hideButtons} onRefresh={refresh} />
