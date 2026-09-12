@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import useArtwork from './useArtwork';
 import ArtworkInfo from './ArtworkInfo';
 import FloatingText from './components/FloatingText/FloatingText';
@@ -24,7 +23,6 @@ function App() {
   const [selectedArtwork, setSelectedArtwork] = useState(null);
   const [hideButtons, setHideButtons] = useState(false);
   const [showCanvas, setShowCanvas] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const textTimer = setTimeout(() => setShowText(true), 15000);
@@ -49,13 +47,6 @@ function App() {
       window.removeEventListener('touchstart', showButtons);
     };
   }, [showText]);
-
-  useEffect(() => {
-    if (loading) return;
-    if (error && !artwork?.primaryImage) {
-      navigate('/next-page');
-    }
-  }, [artwork, loading, error, navigate]);
 
   useEffect(() => {
     if (showCanvas && selectedArtwork?.primaryImage) {
@@ -108,7 +99,7 @@ function App() {
   if (!artworkToShow?.primaryImage) {
     return (
       <div className="fallback">
-        <p>{error || 'No artwork available. Please refresh the page.'}</p>
+        <p>{error || 'No artwork available. Please try again.'}</p>
         <RefreshButton onRefresh={refresh} />
       </div>
     );
