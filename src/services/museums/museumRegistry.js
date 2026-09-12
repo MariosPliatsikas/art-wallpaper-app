@@ -1,7 +1,12 @@
 import metProvider from './metProvider';
 import clevelandProvider from './clevelandProvider';
+import harvardProvider from './harvardProvider';
 
-const providers = [metProvider, clevelandProvider];
+const allProviders = [metProvider, clevelandProvider, harvardProvider];
+
+const providers = allProviders.filter(
+  (provider) => !provider.isConfigured || provider.isConfigured()
+);
 
 export function getMuseumProviders() {
   return providers;
