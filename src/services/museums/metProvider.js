@@ -27,23 +27,35 @@ function normalizeMetArtwork(item) {
   });
 }
 
+function toSearchOptions(input = {}) {
+  if (typeof input === 'string') return { query: input };
+  return input || {};
+}
+
 /**
  * Fetch a random public-domain Met artwork with an image.
+ * Accepts canonical filters: query, type, movement, dateBegin, dateEnd.
  */
-export async function getRandomMetArtwork(query = 'painting') {
+export async function getRandomMetArtwork(input = {}) {
+  const { query, type, movement, dateBegin, dateEnd } = toSearchOptions(input);
   const params = new URLSearchParams({
     hasImages: 'true',
     isPublicDomain: 'true',
-    q: query,
     limit: '100',
     offset: '0',
   });
 
-  const search = await fetchJson(
-    `${config.MET_MUSEUM_API_URL}/search?${params.toString()}`
-  );
+  const searchTerm = movement || type || query || 'art';
+  params.set('q', searchTerm);
 
+  if (Number.isFinite(dateBegin) && Number.isFinite(dateEnd)) {
+    params.set('dateBegin', String(dateBegin));
+    params.set('dateEnd', String(dateEnd));
+  }
+
+  const search = await fetchJson(`${config.MET_MUSEUM_API_URL}/search?${params.toString()}`);
   const objectIDs = search.objectIDs || [];
+
   if (!objectIDs.length) {
     throw new Error('No Met artworks found');
   }
@@ -56,9 +68,7 @@ export async function getRandomMetArtwork(query = 'painting') {
     const item = await fetchJson(
       `https://collectionapi.metmuseum.org/public/collection/v1/objects/${objectID}`
     );
-    if (item.primaryImage) {
-      return normalizeMetArtwork(item);
-    }
+    if (item.primaryImage) return normalizeMetArtwork(item);
   }
 
   throw new Error('No Met artwork with a usable image was found');
