@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import getRandomArtwork from './services/museums/artworkService';
 import toLegacyArtwork from './services/museums/artworkAdapter';
 
@@ -79,13 +79,30 @@ const useArtwork = (query = 'random', subcategory = '') => {
   const [artwork, setArtwork] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const previousArtworkIdRef = useRef(null);
 
   const getArtwork = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const normalizedArtwork = await getRandomArtwork(buildArtworkRequest(query, subcategory));
+      const request = buildArtworkRequest(query, subcategory);
+      let normalizedArtwork = null;
+
+      // Avoid showing the exact same artwork on consecutive refreshes when
+      // the selected filter has enough alternatives. A small retry cap keeps
+      // network usage bounded for narrow queries that may only have one match.
+      for (let attempt = 0; attempt < 3; attempt += 1) {
+        normalizedArtwork = await getRandomArtwork(request);
+        if (
+          !normalizedArtwork?.id ||
+          normalizedArtwork.id !== previousArtworkIdRef.current ||
+          attempt === 2
+        ) {
+          break;
+        }
+      }
+
       const fetchedArtwork = toLegacyArtwork(normalizedArtwork);
 
       if (!fetchedArtwork?.primaryImage) {
@@ -93,6 +110,8 @@ const useArtwork = (query = 'random', subcategory = '') => {
         setArtwork(defaultArtwork);
         return;
       }
+
+      previousArtworkIdRef.current = normalizedArtwork?.id || null;
 
       setArtwork({
         ...fetchedArtwork,
@@ -113,6 +132,7 @@ const useArtwork = (query = 'random', subcategory = '') => {
   }, [query, subcategory]);
 
   useEffect(() => {
+    previousArtworkIdRef.current = null;
     getArtwork();
     const interval = setInterval(getArtwork, 600000);
     return () => clearInterval(interval);
