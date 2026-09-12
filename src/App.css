@@ -18,17 +18,8 @@
   overflow: hidden;
 }
 
-/* Loading state */
-.App.loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 2rem;
-  color: white;
-  background-color: black;
-}
+.App.loading { display: flex; justify-content: center; align-items: center; font-size: 2rem; color: white; background-color: black; }
 
-/* Artwork information panel */
 .artwork-info {
   position: absolute;
   bottom: 20px;
@@ -42,284 +33,89 @@
   font-family: 'Dancing Script', cursive;
   transition: opacity 0.3s ease;
 }
-
 .artwork-info p { margin: 5px 0; }
 .artist-name { font-weight: bold; font-size: 1.2rem; }
 .artwork-title { font-style: italic; }
 .artwork-date, .artwork-medium, .artwork-source { color: rgba(255, 255, 255, 0.8); }
 .artwork-source { font-style: italic; margin-top: 5px; }
 
-/* Loading spinner */
-.loading-spinner {
-  border: 4px solid rgba(255, 255, 255, 0.3);
-  border-top: 4px solid white;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  animation: spin 1s linear infinite;
-}
+.loading-spinner { border: 4px solid rgba(255,255,255,.3); border-top: 4px solid white; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-/* Floating text for artwork title and date */
-.floating-text {
-  position: absolute;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-family: 'Dancing Script', cursive;
-  color: rgba(255, 255, 255, 0.8);
-  text-align: center;
-  font-size: 1.5rem;
-  opacity: 0;
-  transition: opacity 1s ease-in-out;
-  animation: float 20s ease-in-out infinite;
-}
+.floating-text { position: absolute; left: 50%; transform: translate(-50%,-50%); font-family: 'Dancing Script', cursive; color: rgba(255,255,255,.8); text-align: center; font-size: 1.5rem; opacity: 0; transition: opacity 1s ease-in-out; animation: float 20s ease-in-out infinite; }
 .floating-text.visible { opacity: 1; }
 .floating-text.center { top: 30%; }
 .floating-text.bottom { top: 70%; }
 
-/* Favorites and toggle buttons container */
-.button-container {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  z-index: 1000;
-}
-.favorite-button, .favorites-toggle {
-  background: rgba(255, 255, 255, 0.3);
-  border: 2px solid rgba(255, 255, 255, 0.5);
-  border-radius: 5px;
-  padding: 8px 16px;
-  font-family: 'Dancing Script', cursive;
-  font-size: 1.2rem;
-  color: white;
-  cursor: pointer;
-  transition: opacity 3s ease, background 0.3s ease, transform 0.3s ease;
-}
-.favorite-button:hover, .favorite-button:focus, .favorites-toggle:hover, .favorites-toggle:focus {
-  background: rgba(255, 255, 255, 0.6);
-  transform: scale(1.05);
-  outline: 2px solid white;
-  outline-offset: 2px;
-}
+.button-container { position: absolute; top: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 1000; }
+.favorite-button, .favorites-toggle { background: rgba(255,255,255,.3); border: 2px solid rgba(255,255,255,.5); border-radius: 5px; padding: 8px 16px; font-family: 'Dancing Script', cursive; font-size: 1.2rem; color: white; cursor: pointer; transition: opacity 3s ease, background .3s ease, transform .3s ease; }
+.favorite-button:hover, .favorite-button:focus, .favorites-toggle:hover, .favorites-toggle:focus { background: rgba(255,255,255,.6); transform: scale(1.05); outline: 2px solid white; outline-offset: 2px; }
 .favorite-button.hidden, .favorites-toggle.hidden { opacity: 0; pointer-events: none; }
 
-/* Category menu styling */
-.category-menu {
-  position: absolute;
-  top: 120px;
-  left: 20px;
-  display: flex;
-  gap: 10px;
-  z-index: 1000;
-  opacity: 1;
-  transition: opacity 3s ease;
-  min-width: 150px;
-  font-family: 'Dancing Script', cursive;
-}
+.category-menu { position: absolute; top: 120px; left: 20px; display: flex; gap: 10px; z-index: 1000; opacity: 1; transition: opacity 3s ease; min-width: 150px; font-family: 'Dancing Script', cursive; }
 .category-menu.hidden { opacity: 0; pointer-events: none; }
 .category-menu.visible { opacity: 1; pointer-events: auto; }
 .category-item { position: relative; }
-.category-button {
-  background: rgba(255, 255, 255, 0.3);
-  border: 2px solid rgba(255, 255, 255, 0.5);
-  border-radius: 5px;
-  padding: 8px 16px;
-  font-family: 'Dancing Script', cursive;
-  font-size: 1.2rem;
-  color: #fff;
-  cursor: pointer;
-  transition: opacity 3s ease, background 0.3s ease, transform 0.3s ease;
-}
-.category-button:hover, .category-button:focus {
-  background: rgba(255, 255, 255, 0.6);
-  transform: scale(1.05);
-  outline: 2px solid #fff;
-  outline-offset: 2px;
-}
-.subcategory-menu {
-  display: none;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background: rgba(0, 0, 0, 0.8);
-  border-radius: 5px;
-  padding: 10px;
-  flex-direction: column;
-  gap: 5px;
-}
+.category-button { background: rgba(255,255,255,.3); border: 2px solid rgba(255,255,255,.5); border-radius: 5px; padding: 8px 16px; font-family: 'Dancing Script', cursive; font-size: 1.2rem; color: #fff; cursor: pointer; transition: opacity 3s ease, background .3s ease, transform .3s ease; }
+.category-button:hover, .category-button:focus { background: rgba(255,255,255,.6); transform: scale(1.05); outline: 2px solid #fff; outline-offset: 2px; }
+.subcategory-menu { display: none; position: absolute; top: 100%; left: 0; background: rgba(0,0,0,.8); border-radius: 5px; padding: 10px; flex-direction: column; gap: 5px; }
 .category-item:hover .subcategory-menu { display: flex; }
-.subcategory-button {
-  background: transparent;
-  border: none;
-  font-family: 'Dancing Script', cursive;
-  font-size: 1rem;
-  color: #fff;
-  cursor: pointer;
-  text-align: left;
-  transition: color 0.3s ease;
-}
+.subcategory-button { background: transparent; border: none; font-family: 'Dancing Script', cursive; font-size: 1rem; color: #fff; cursor: pointer; text-align: left; transition: color .3s ease; }
 .subcategory-button:hover, .subcategory-button:focus { color: #e5ecf3; text-decoration: underline; }
 .category-menu p { color: white; font-size: 16px; margin: 0; padding: 5px 10px; }
 
-/* Exit button for OpenSeadragon canvas */
-.exit-canvas-button {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: #ff4d4d;
-  border: none;
-  border-radius: 5px;
-  padding: 10px 20px;
-  font-family: 'Dancing Script', cursive;
-  font-size: 1rem;
-  color: white;
-  cursor: pointer;
-  z-index: 1000;
-  transition: all 0.3s ease;
-}
-.exit-canvas-button:hover, .exit-canvas-button:focus {
-  background: #e63939;
-  transform: scale(1.05);
-  outline: 2px solid white;
-  outline-offset: 2px;
-}
+.exit-canvas-button { position: absolute; top: 10px; right: 10px; background: #ff4d4d; border: none; border-radius: 5px; padding: 10px 20px; font-family: 'Dancing Script', cursive; font-size: 1rem; color: white; cursor: pointer; z-index: 1000; transition: all .3s ease; }
+.exit-canvas-button:hover, .exit-canvas-button:focus { background: #e63939; transform: scale(1.05); outline: 2px solid white; outline-offset: 2px; }
 
-/* Favorites list */
-.favorites-list {
-  position: absolute;
-  top: 50px;
-  right: 10px;
-  background: rgba(0, 0, 0, 0.8);
-  padding: 10px;
-  border-radius: 5px;
-  max-width: 300px;
-  max-height: 400px;
-  overflow-y: auto;
-  color: white;
-  font-family: 'Dancing Script', cursive;
-}
+.favorites-list { position: absolute; top: 50px; right: 10px; background: rgba(0,0,0,.8); padding: 10px; border-radius: 5px; max-width: 300px; max-height: 400px; overflow-y: auto; color: white; font-family: 'Dancing Script', cursive; }
 .favorites-list ul { list-style: none; padding: 0; }
 .favorites-list li { display: flex; align-items: center; margin-bottom: 10px; cursor: pointer; }
 .favorites-list img { width: 50px; height: 50px; margin-right: 10px; border-radius: 5px; }
-.clear-favorites-button {
-  background: linear-gradient(to right, #3f322d, #483027);
-  border: none;
-  border-radius: 5px;
-  padding: 10px 15px;
-  font-size: 1rem;
-  color: white;
-  cursor: pointer;
-  margin-bottom: 10px;
-  transition: all 0.3s ease;
-}
-.clear-favorites-button:hover, .clear-favorites-button:focus {
-  background: linear-gradient(to right, #554441, #ff0000);
-  transform: scale(1.05);
-}
+.clear-favorites-button { background: linear-gradient(to right,#3f322d,#483027); border: none; border-radius: 5px; padding: 10px 15px; font-size: 1rem; color: white; cursor: pointer; margin-bottom: 10px; transition: all .3s ease; }
+.clear-favorites-button:hover, .clear-favorites-button:focus { background: linear-gradient(to right,#554441,#ff0000); transform: scale(1.05); }
 
-/* Fallback UI for errors or no artwork */
-.fallback {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  background-color: black;
-  color: #b6b3b3;
-  font-family: 'Dancing Script', cursive;
-  font-size: 2.3rem;
-  text-align: center;
-  padding: 20px;
-}
-.fallback p { font-size: 1.8rem; margin: 0 0 20px 0; padding: 0; }
-.fallback .refresh-button {
-  padding: 15px 20px;
-  font-size: 20px;
-  background: rgba(255, 255, 255, 0.3);
-  color: white;
-  border: 2px solid rgba(255, 255, 255, 0.5);
-  border-radius: 20px;
-  cursor: pointer;
-}
-button.refresh-button {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  padding: 15px 20px;
-  font-size: 20px;
-  font-family: 'Dancing Script', cursive;
-  background: rgba(255, 255, 255, 0.3);
-  color: white;
-  border: 2px solid rgba(255, 255, 255, 0.5);
-  border-radius: 20px;
-  cursor: pointer;
-  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
-  transition: opacity 3s ease, background 0.3s ease, transform 0.3s ease;
-}
+.fallback { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; background-color: black; color: #b6b3b3; font-family: 'Dancing Script', cursive; font-size: 2.3rem; text-align: center; padding: 20px; }
+.fallback p { font-size: 1.8rem; margin: 0 0 20px; padding: 0; }
+.fallback .refresh-button { padding: 15px 20px; font-size: 20px; background: rgba(255,255,255,.3); color: white; border: 2px solid rgba(255,255,255,.5); border-radius: 20px; cursor: pointer; }
+button.refresh-button { position: absolute; bottom: 20px; right: 20px; padding: 15px 20px; font-size: 20px; font-family: 'Dancing Script', cursive; background: rgba(255,255,255,.3); color: white; border: 2px solid rgba(255,255,255,.5); border-radius: 20px; cursor: pointer; text-shadow: 2px 2px 5px rgba(0,0,0,.7); transition: opacity 3s ease, background .3s ease, transform .3s ease; }
 button.refresh-button.hidden { opacity: 0; pointer-events: none; }
 .google-search-link { color: #8a959f; text-decoration: none; }
 .google-search-link:hover, .google-search-link:focus { color: #e5ecf3; text-decoration: underline; }
 img { max-width: 100%; height: auto; }
 
-/* Responsive styles for tablets */
 @media (max-width: 768px) {
-  .artwork-info { bottom: 15px; left: 15px; font-size: 0.9rem; max-width: 250px; }
+  .artwork-info { bottom: 15px; left: 15px; font-size: .9rem; max-width: 250px; }
   .floating-text { font-size: 1.2rem; }
   .button-container { top: 15px; right: 15px; flex-direction: column; }
   .favorite-button, .favorites-toggle { font-size: 1rem; padding: 6px 12px; }
   .category-menu { top: 110px; left: 15px; flex-direction: column; }
   .category-button { font-size: 1rem; padding: 6px 12px; }
-  .exit-canvas-button { padding: 8px 16px; font-size: 0.9rem; }
+  .exit-canvas-button { padding: 8px 16px; font-size: .9rem; }
   .favorites-list { max-width: 250px; max-height: 300px; }
   .refresh-button { bottom: 15px; right: 15px; font-size: 16px; padding: 10px 15px; }
   .fallback { font-size: 1.8rem; }
 }
 
-/* Responsive styles for small portrait screens */
 @media (max-width: 480px) {
-  .artwork-info { bottom: 10px; left: 10px; font-size: 0.8rem; max-width: 200px; }
+  .artwork-info { bottom: 10px; left: 10px; font-size: .8rem; max-width: 200px; }
   .floating-text { font-size: 1rem; }
   .button-container { top: 10px; right: 10px; }
-  .favorite-button, .favorites-toggle { font-size: 0.9rem; padding: 5px 10px; }
+  .favorite-button, .favorites-toggle { font-size: .9rem; padding: 5px 10px; }
   .category-menu { top: 100px; left: 10px; }
-  .category-button { font-size: 0.9rem; padding: 5px 10px; }
-  .exit-canvas-button { padding: 6px 12px; font-size: 0.8rem; }
+  .category-button { font-size: .9rem; padding: 5px 10px; }
+  .exit-canvas-button { padding: 6px 12px; font-size: .8rem; }
   .favorites-list { max-width: 200px; max-height: 250px; }
   .refresh-button { bottom: 10px; right: 10px; font-size: 14px; padding: 8px 12px; }
   .fallback { font-size: 1.5rem; }
 }
 
-/* Mobile landscape is an artwork-first viewing mode.
-   Controls still appear on interaction, but metadata stays out of the painting. */
+/* Artwork-first mobile landscape. Metadata is hidden until the user taps the artwork. */
 @media (orientation: landscape) and (max-height: 500px) and (pointer: coarse) {
-  .artwork-info {
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .floating-text {
-    display: none;
-  }
-
-  .category-menu {
-    top: 12px;
-    left: 12px;
-    flex-direction: row;
-    gap: 6px;
-  }
-
-  .category-button,
-  .favorite-button,
-  .favorites-toggle {
-    font-size: 0.8rem;
-    padding: 5px 9px;
-  }
-
-  .button-container {
-    top: 12px;
-    right: 12px;
-  }
+  .artwork-info { opacity: 0; pointer-events: none; max-width: min(300px, 42vw); font-size: .82rem; bottom: 12px; left: 12px; }
+  .mobile-info-visible .artwork-info { opacity: 1; pointer-events: auto; }
+  .mobile-info-visible .artwork-info .artist-name { font-size: 1rem; }
+  .floating-text { display: none; }
+  .category-menu { top: 12px; left: 12px; flex-direction: row; gap: 6px; }
+  .category-button, .favorite-button, .favorites-toggle { font-size: .8rem; padding: 5px 9px; }
+  .button-container { top: 12px; right: 12px; }
 }
