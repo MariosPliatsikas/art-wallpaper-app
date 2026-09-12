@@ -19,8 +19,8 @@ function App() {
   const [selectedArtwork, setSelectedArtwork] = useState(null);
   const [hideButtons, setHideButtons] = useState(false);
   const [showCanvas, setShowCanvas] = useState(false);
-  const [mobileInfoVisible, setMobileInfoVisible] = useState(false);
-  const mobileInfoTimerRef = useRef(null);
+  const [artworkInfoVisible, setArtworkInfoVisible] = useState(false);
+  const artworkInfoTimerRef = useRef(null);
 
   useEffect(() => {
     const textTimer = setTimeout(() => setShowText(true), 15000);
@@ -46,7 +46,7 @@ function App() {
     };
   }, [showText]);
 
-  useEffect(() => () => clearTimeout(mobileInfoTimerRef.current), []);
+  useEffect(() => () => clearTimeout(artworkInfoTimerRef.current), []);
 
   useEffect(() => {
     if (showCanvas && selectedArtwork?.primaryImage) {
@@ -59,23 +59,27 @@ function App() {
     }
   }, [showCanvas, selectedArtwork]);
 
-  const isMobileLandscape = useCallback(() => {
-    return window.matchMedia('(orientation: landscape) and (max-height: 500px) and (pointer: coarse)').matches;
+  const isArtworkFirstMode = useCallback(() => {
+    const desktop = window.matchMedia('(min-width: 769px) and (pointer: fine)').matches;
+    const mobileLandscape = window.matchMedia(
+      '(orientation: landscape) and (max-height: 500px) and (pointer: coarse)'
+    ).matches;
+    return desktop || mobileLandscape;
   }, []);
 
-  const handleArtworkTap = useCallback((event) => {
-    if (!isMobileLandscape() || showCanvas) return;
+  const handleArtworkInteraction = useCallback((event) => {
+    if (!isArtworkFirstMode() || showCanvas) return;
     if (event.target.closest('button, a, .category-menu, .favorites-list')) return;
 
-    clearTimeout(mobileInfoTimerRef.current);
-    setMobileInfoVisible((visible) => {
+    clearTimeout(artworkInfoTimerRef.current);
+    setArtworkInfoVisible((visible) => {
       const nextVisible = !visible;
       if (nextVisible) {
-        mobileInfoTimerRef.current = setTimeout(() => setMobileInfoVisible(false), 7000);
+        artworkInfoTimerRef.current = setTimeout(() => setArtworkInfoVisible(false), 7000);
       }
       return nextVisible;
     });
-  }, [isMobileLandscape, showCanvas]);
+  }, [isArtworkFirstMode, showCanvas]);
 
   const addToFavorites = useCallback((item) => {
     setFavorites((prev) => [...prev, item]);
@@ -102,7 +106,8 @@ function App() {
 
   const handleCategorySelect = useCallback((category, subcategory) => {
     setSelectedArtwork(null);
-    setMobileInfoVisible(false);
+    setArtworkInfoVisible(false);
+    clearTimeout(artworkInfoTimerRef.current);
     setSelectedCategory(category);
     setSelectedSubcategory(subcategory);
   }, []);
@@ -122,8 +127,8 @@ function App() {
 
   return (
     <div
-      className={`App ${mobileInfoVisible ? 'mobile-info-visible' : ''}`}
-      onClick={handleArtworkTap}
+      className={`App ${artworkInfoVisible ? 'artwork-info-visible' : ''}`}
+      onClick={handleArtworkInteraction}
       style={{
         backgroundImage: `url(${artworkToShow.primaryImage})`,
         backgroundPosition: 'center',
