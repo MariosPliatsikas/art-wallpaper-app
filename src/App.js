@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useArtwork from './useArtwork';
@@ -12,11 +11,11 @@ import OpenSeadragon from 'openseadragon';
 import './App.css';
 
 /**
- * Main component of the Art Wallpaper App.
+ * Main component of Art Wallpaper Museum.
  * Displays random artworks, manages favorites, and integrates zoom functionality.
  */
 function App() {
-  const [selectedCategory, setSelectedCategory] = useState('type');
+  const [selectedCategory, setSelectedCategory] = useState('random');
   const [selectedSubcategory, setSelectedSubcategory] = useState('');
   const { artwork, loading, error, refresh } = useArtwork(selectedCategory, selectedSubcategory);
   const [showText, setShowText] = useState(false);
@@ -27,21 +26,10 @@ function App() {
   const [showCanvas, setShowCanvas] = useState(false);
   const navigate = useNavigate();
 
-  // Debug artwork, loading, error, and hideButtons states
   useEffect(() => {
-    console.log('useArtwork state:', { artwork, loading, error });
-    console.log('hideButtons state:', hideButtons);
-  }, [artwork, loading, error, hideButtons]);
-
-  // Manage UI visibility (text and buttons)
-  useEffect(() => {
-    // Show text after 15 seconds
     const textTimer = setTimeout(() => setShowText(true), 15000);
-
-    // Hide text after 10 seconds
     const hideTextTimer = showText ? setTimeout(() => setShowText(false), 10000) : null;
 
-    // Show buttons and title on mouse move/touch and hide after 5 seconds
     let hideButtonsTimeout;
     const showButtons = () => {
       setHideButtons(false);
@@ -51,7 +39,6 @@ function App() {
 
     window.addEventListener('mousemove', showButtons);
     window.addEventListener('touchstart', showButtons);
-
     hideButtonsTimeout = setTimeout(() => setHideButtons(true), 5000);
 
     return () => {
@@ -63,16 +50,13 @@ function App() {
     };
   }, [showText]);
 
-  // Redirect if no artwork or error
   useEffect(() => {
     if (loading) return;
     if (error && !artwork?.primaryImage) {
-      console.log('Redirecting to /next-page due to:', { error, hasPrimaryImage: !!artwork?.primaryImage });
       navigate('/next-page');
     }
   }, [artwork, loading, error, navigate]);
 
-  // Initialize OpenSeadragon for zoom
   useEffect(() => {
     if (showCanvas && selectedArtwork?.primaryImage) {
       const viewer = OpenSeadragon({
@@ -84,7 +68,6 @@ function App() {
     }
   }, [showCanvas, selectedArtwork]);
 
-  // Favorites management
   const addToFavorites = useCallback((item) => {
     setFavorites((prev) => [...prev, item]);
     saveFavorite(item);
@@ -110,16 +93,14 @@ function App() {
     setShowCanvas(false);
   }, []);
 
-  // Handle category and subcategory selection
   const handleCategorySelect = useCallback((category, subcategory) => {
+    setSelectedArtwork(null);
     setSelectedCategory(category);
     setSelectedSubcategory(subcategory);
-    refresh();
-  }, [refresh]);
+  }, []);
 
   const artworkToShow = selectedArtwork || artwork;
 
-  // Fallback UI
   if (loading) {
     return <div className="fallback">Loading...</div>;
   }
@@ -142,9 +123,8 @@ function App() {
         backgroundSize: 'contain',
       }}
     >
-      {/* Add the app title with hide/show behavior */}
       <div className={`app-title ${hideButtons ? 'hidden' : 'visible'}`} id="appTitle">
-        Art Wallpaper App
+        Art Wallpaper Museum
       </div>
       <ArtworkInfo artwork={artworkToShow} />
       {showText && (
