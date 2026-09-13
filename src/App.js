@@ -22,6 +22,8 @@ function App() {
   const [showCanvas, setShowCanvas] = useState(false);
   const [artworkInfoVisible, setArtworkInfoVisible] = useState(false);
   const artworkInfoTimerRef = useRef(null);
+  const viewerRef = useRef(null);
+  const pendingWheelDeltaRef = useRef(0);
 
   useEffect(() => {
     const textTimer = setTimeout(() => setShowText(true), 15000);
@@ -56,7 +58,23 @@ function App() {
         prefixUrl: '/node_modules/openseadragon/images/',
         tileSources: { type: 'image', url: zoomArtwork.primaryImage },
       });
-      return () => viewer.destroy();
+
+      viewerRef.current = viewer;
+
+      viewer.addOnceHandler('open', () => {
+        const delta = pendingWheelDeltaRef.current;
+        if (delta !== 0) {
+          const factor = delta < 0 ? 1.25 : 0.8;
+          viewer.viewport.zoomBy(factor);
+          viewer.viewport.applyConstraints();
+          pendingWheelDeltaRef.current = 0;
+        }
+      });
+
+      return () => {
+        viewerRef.current = null;
+        viewer.destroy();
+      };
     }
   }, [showCanvas, zoomArtwork]);
 
@@ -66,6 +84,10 @@ function App() {
       '(orientation: landscape) and (max-height: 500px) and (pointer: coarse)'
     ).matches;
     return desktop || mobileLandscape;
+  }, []);
+
+  const isDesktop = useCallback(() => {
+    return window.matchMedia('(min-width: 769px) and (pointer: fine)').matches;
   }, []);
 
   const handleArtworkInteraction = useCallback((event) => {
@@ -107,6 +129,7 @@ function App() {
   const handleExitCanvas = useCallback(() => {
     setShowCanvas(false);
     setZoomArtwork(null);
+    pendingWheelDeltaRef.current = 0;
   }, []);
 
   const handleCategorySelect = useCallback((category, subcategory) => {
@@ -119,17 +142,17 @@ function App() {
 
   const artworkToShow = selectedArtwork || artwork;
 
-  const handleZoomCurrentArtwork = useCallback(() => {
-    if (!artworkToShow?.primaryImage) return;
+  const handleArtworkWheel = useCallback((event) => {
+    if (!isDesktop() || showCanvas || !artworkToShow?.primaryImage) return;
+    if (event.target.closest('button, a, .category-menu, .favorites-list')) return;
+
+    event.preventDefault();
+    pendingWheelDeltaRef.current = event.deltaY;
     setZoomArtwork(artworkToShow);
     setArtworkInfoVisible(false);
     clearTimeout(artworkInfoTimerRef.current);
     setShowCanvas(true);
-  }, [artworkToShow]);
-
-  const isDesktopZoomAvailable =
-    typeof window !== 'undefined' &&
-    window.matchMedia('(min-width: 769px) and (pointer: fine)').matches;
+  }, [artworkToShow, isDesktop, showCanvas]);
 
   if (loading) return <div className="fallback">Loading...</div>;
 
@@ -146,6 +169,7 @@ function App() {
     <div
       className={`App ${artworkInfoVisible ? 'artwork-info-visible' : ''}`}
       onClick={handleArtworkInteraction}
+      onWheel={handleArtworkWheel}
       style={{
         backgroundImage: `url(${artworkToShow.primaryImage})`,
         backgroundPosition: 'center',
@@ -173,31 +197,6 @@ function App() {
       </div>
       {showFavorites && (
         <FavoritesList favorites={favorites} onSelectFavorite={handleSelectFavorite} onClearFavorites={handleClearFavorites} />
-      )}
-      {!showCanvas && isDesktopZoomAvailable && (
-        <button
-          onClick={handleZoomCurrentArtwork}
-          aria-label="Zoom artwork"
-          title="Zoom artwork"
-          style={{
-            position: 'absolute',
-            right: '20px',
-            bottom: '90px',
-            zIndex: 1000,
-            opacity: hideButtons ? 0 : 1,
-            pointerEvents: hideButtons ? 'none' : 'auto',
-            padding: '10px 14px',
-            borderRadius: '18px',
-            border: '2px solid rgba(255,255,255,0.5)',
-            background: 'rgba(255,255,255,0.3)',
-            color: 'white',
-            cursor: 'pointer',
-            fontSize: '16px',
-            transition: 'opacity 3s ease, background 0.3s ease',
-          }}
-        >
-          🔍 Zoom
-        </button>
       )}
       {showCanvas && (
         <>
