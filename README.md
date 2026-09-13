@@ -1,75 +1,203 @@
+# Art Wallpaper Museum
 
-# Art Wallpaper App
+**One application. Multiple museums. Thousands of artworks. A new work of art on your screen.**
 
-![Art Wallpaper App Screenshot](./public/screenshot.png) <!-- Add image -->
+Art Wallpaper Museum is a React application that turns your screen into a rotating digital gallery. It brings together artworks from multiple museum APIs behind one common interface, so the user can explore art by museum, type, period, or movement without needing to know where the data came from.
 
-The **Art Wallpaper App** changes your device's wallpaper with art pieces from various museums, while also offering you the ability to listen to music from MusicBrainz. The app automatically updates every 10 minutes with new art pieces and songs.
+## Vision
 
-## 🚀 Features
+The goal is to create a calm, artwork-first experience: the artwork should remain the focus, while information, filters, favorites, and zoom are available only when the user wants them.
 
-- Display random art pieces from the Metropolitan Museum of Art.
-- Play music from MusicBrainz.
-- User interaction: Display information about the art piece after 15 seconds.
-- Automatic update every 10 minutes.
+The project is evolving from the original Art Wallpaper App into a museum-agnostic platform that can support multiple institutions through a shared provider architecture.
 
-## 🛠️ Technologies
+## Current museum sources
 
-- **React**: JavaScript library for building user interfaces.
-- **React Router**: For managing routes in the app.
-- **Metropolitan Museum of Art API**: For retrieving art pieces.
-- **MusicBrainz API**: For playing music.
-- **CSS**: For the style and aesthetics of the app.
+- The Metropolitan Museum of Art
+- Cleveland Museum of Art
+- Harvard Art Museums — enabled only when a Harvard API key is configured
 
-## 📦 Installation
+The Met and Cleveland integrations use public museum APIs. Harvard requires an API key.
 
-Follow the steps below to run the app locally:
+## Features
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/MariosPliatsikas/art-wallpaper-app.git
-Navigate to the project folder:
-bash
+- Random artwork discovery across enabled museums
+- Museum-specific browsing
+- Filters by artwork type, period, and movement
+- 10-minute automatic artwork refresh
+- Manual refresh without losing the selected filter or museum
+- Favorites stored in localStorage
+- High-resolution artwork viewing with OpenSeadragon
+- Desktop artwork-first mode
+  - click the artwork to show metadata temporarily
+  - use the mouse wheel to enter zoom mode and continue zooming
+- Mobile landscape artwork-first mode
+  - tap the artwork to show metadata temporarily
+  - metadata hides automatically after a few seconds
+- Offline/API error state with retry behavior
+- Responsive desktop and mobile layout
+
+## Museum provider architecture
+
+The UI does not talk directly to individual museum APIs. Each museum has its own provider that converts source-specific data into one normalized artwork model.
+
+```text
+Museum API
+  ↓
+Museum Provider
+  ↓
+normalizeArtwork()
+  ↓
+Common Artwork Object
+  ↓
+artworkService
+  ↓
+React UI
+```
+
+The normalized model currently contains:
+
+```js
+{
+  id,
+  title,
+  artist,
+  date,
+  image,
+  imageLarge,
+  museum,
+  sourceUrl,
+  category,
+  license,
+  medium
+}
+```
+
+Museum integrations live in:
+
+```text
+src/services/museums/
+```
+
+Current providers:
+
+```text
+metProvider.js
+clevelandProvider.js
+harvardProvider.js
+```
+
+The registry enables only providers that are available/configured.
+
+## Open access and image rights
+
+Museum APIs expose artwork metadata and images under different rights conditions. The application keeps source and license information in the normalized artwork model where available.
+
+When extending the project with new museums, image rights and API terms should be reviewed for each provider independently.
+
+## Development
+
+This repository uses Yarn.
+
+### Requirements
+
+- Node.js 20+
+- Yarn
+
+### Install
+
+```bash
+git clone https://github.com/MariosPliatsikas/art-wallpaper-app.git
 cd art-wallpaper-app
+yarn install
+```
 
-Install dependencies:
-bash
-npm install
+### Environment variables
 
-Create a .env file and add the MusicBrainz API token:
-plaintext
-REACT_APP_MUSIC_API_TOKEN=your_api_token_here
+Copy the example file:
 
-Start the app:
+```bash
+cp .env.example .env.local
+```
 
-bash
-npm start
-Open your browser at http://localhost:3000.
+Harvard Art Museums is optional. To enable it, add your own key:
 
-🧪 Testing
-To run tests, use the command:
-bash
-Copy
-npm test
+```text
+REACT_APP_HARVARD_API_KEY=your_key_here
+```
 
-🚀 Development
-To create a production build, run:
-bash
-npm run build
+Do not commit `.env.local` or API credentials.
 
-🤝 Contribution
-Contributions are welcome! If you want to contribute, please follow these steps:
+Note: variables prefixed with `REACT_APP_` are included in the client-side bundle. They should not be treated as true secrets.
 
-Fork the repository.
+### Start the development server
 
-Create a new branch (git checkout -b feature/YourFeatureName).
+```bash
+yarn start
+```
 
-Commit your changes (git commit -m 'Add some feature').
+### Run tests
 
-Push to the branch (git push origin feature/YourFeatureName).
+```bash
+yarn test --watchAll=false
+```
 
-Open a Pull Request.
+### Production build
 
-📄 License
-This project is licensed under the MIT License. See the LICENSE file for more details.
+```bash
+yarn build
+```
 
-This project was bootstrapped with Create React App.
+## Continuous integration
+
+The `art-wallpaper-museum-v2` branch is validated with GitHub Actions.
+
+The workflow currently checks:
+
+- dependency installation with the Yarn lockfile
+- unit tests
+- live availability of the public Met and Cleveland API endpoints
+- production build
+
+Harvard is not part of the live CI smoke test because it requires a private API key configuration.
+
+## Deployment
+
+The project is deployed with Vercel.
+
+The current architecture is intentionally lightweight and primarily client-side so the project can remain economical to host while it is still being developed and tested.
+
+Preview deployments are used to validate changes before merging them into `main`.
+
+## Project direction
+
+Planned improvements include:
+
+- migrate the remaining legacy UI fields fully to the normalized artwork model
+- stronger provider and artwork-service tests
+- improved randomization and pagination for large museum collections
+- more museum providers
+- richer artwork metadata where useful
+- accessibility improvements
+- further refinement of desktop and mobile artwork-first controls
+
+## Contributing
+
+Contributions are welcome.
+
+A useful contribution can include:
+
+- a new museum provider
+- tests for an existing provider
+- UX/accessibility improvements
+- documentation
+- bug fixes
+
+Please keep museum-specific logic inside its provider whenever possible instead of coupling it directly to the React UI.
+
+## License
+
+This project is licensed under the MIT License. See the `LICENSE` file for details.
+
+---
+
+Art Wallpaper Museum is currently under active development. The `art-wallpaper-museum-v2` branch is the preview/testing branch for the new multi-museum architecture.
