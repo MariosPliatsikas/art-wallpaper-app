@@ -22,7 +22,6 @@ function App() {
   const [showCanvas, setShowCanvas] = useState(false);
   const [artworkInfoVisible, setArtworkInfoVisible] = useState(false);
   const artworkInfoTimerRef = useRef(null);
-  const viewerRef = useRef(null);
   const pendingWheelDeltaRef = useRef(0);
 
   useEffect(() => {
@@ -59,8 +58,6 @@ function App() {
         tileSources: { type: 'image', url: zoomArtwork.primaryImage },
       });
 
-      viewerRef.current = viewer;
-
       viewer.addOnceHandler('open', () => {
         const delta = pendingWheelDeltaRef.current;
         if (delta !== 0) {
@@ -71,10 +68,7 @@ function App() {
         }
       });
 
-      return () => {
-        viewerRef.current = null;
-        viewer.destroy();
-      };
+      return () => viewer.destroy();
     }
   }, [showCanvas, zoomArtwork]);
 
