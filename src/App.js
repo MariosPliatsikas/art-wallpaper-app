@@ -1,6 +1,4 @@
-
-import React, { useEffect, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import useArtwork from './useArtwork';
 import ArtworkInfo from './ArtworkInfo';
 import FloatingText from './components/FloatingText/FloatingText';
@@ -11,37 +9,25 @@ import { saveFavorite, getFavorites, clearFavorites } from './database';
 import OpenSeadragon from 'openseadragon';
 import './App.css';
 
-/**
- * Main component of the Art Wallpaper App.
- * Displays random artworks, manages favorites, and integrates zoom functionality.
- */
 function App() {
-  const [selectedCategory, setSelectedCategory] = useState('type');
+  const [selectedCategory, setSelectedCategory] = useState('random');
   const [selectedSubcategory, setSelectedSubcategory] = useState('');
   const { artwork, loading, error, refresh } = useArtwork(selectedCategory, selectedSubcategory);
   const [showText, setShowText] = useState(false);
   const [favorites, setFavorites] = useState([]);
   const [showFavorites, setShowFavorites] = useState(false);
   const [selectedArtwork, setSelectedArtwork] = useState(null);
+  const [zoomArtwork, setZoomArtwork] = useState(null);
   const [hideButtons, setHideButtons] = useState(false);
   const [showCanvas, setShowCanvas] = useState(false);
-  const navigate = useNavigate();
+  const [artworkInfoVisible, setArtworkInfoVisible] = useState(false);
+  const artworkInfoTimerRef = useRef(null);
+  const pendingWheelDeltaRef = useRef(0);
 
-  // Debug artwork, loading, error, and hideButtons states
   useEffect(() => {
-    console.log('useArtwork state:', { artwork, loading, error });
-    console.log('hideButtons state:', hideButtons);
-  }, [artwork, loading, error, hideButtons]);
-
-  // Manage UI visibility (text and buttons)
-  useEffect(() => {
-    // Show text after 15 seconds
     const textTimer = setTimeout(() => setShowText(true), 15000);
-
-    // Hide text after 10 seconds
     const hideTextTimer = showText ? setTimeout(() => setShowText(false), 10000) : null;
 
-    // Show buttons and title on mouse move/touch and hide after 5 seconds
     let hideButtonsTimeout;
     const showButtons = () => {
       setHideButtons(false);
@@ -51,7 +37,6 @@ function App() {
 
     window.addEventListener('mousemove', showButtons);
     window.addEventListener('touchstart', showButtons);
-
     hideButtonsTimeout = setTimeout(() => setHideButtons(true), 5000);
 
     return () => {
@@ -63,28 +48,56 @@ function App() {
     };
   }, [showText]);
 
-  // Redirect if no artwork or error
-  useEffect(() => {
-    if (loading) return;
-    if (error && !artwork?.primaryImage) {
-      console.log('Redirecting to /next-page due to:', { error, hasPrimaryImage: !!artwork?.primaryImage });
-      navigate('/next-page');
-    }
-  }, [artwork, loading, error, navigate]);
+  useEffect(() => () => clearTimeout(artworkInfoTimerRef.current), []);
 
-  // Initialize OpenSeadragon for zoom
   useEffect(() => {
-    if (showCanvas && selectedArtwork?.primaryImage) {
+    if (showCanvas && zoomArtwork?.primaryImage) {
       const viewer = OpenSeadragon({
         id: 'openseadragon-canvas',
         prefixUrl: '/node_modules/openseadragon/images/',
-        tileSources: { type: 'image', url: selectedArtwork.primaryImage },
+        tileSources: { type: 'image', url: zoomArtwork.primaryImage },
       });
+
+      viewer.addOnceHandler('open', () => {
+        const delta = pendingWheelDeltaRef.current;
+        if (delta !== 0) {
+          const factor = delta < 0 ? 1.25 : 0.8;
+          viewer.viewport.zoomBy(factor);
+          viewer.viewport.applyConstraints();
+          pendingWheelDeltaRef.current = 0;
+        }
+      });
+
       return () => viewer.destroy();
     }
-  }, [showCanvas, selectedArtwork]);
+  }, [showCanvas, zoomArtwork]);
 
-  // Favorites management
+  const isArtworkFirstMode = useCallback(() => {
+    const desktop = window.matchMedia('(min-width: 769px) and (pointer: fine)').matches;
+    const mobileLandscape = window.matchMedia(
+      '(orientation: landscape) and (max-height: 500px) and (pointer: coarse)'
+    ).matches;
+    return desktop || mobileLandscape;
+  }, []);
+
+  const isDesktop = useCallback(() => {
+    return window.matchMedia('(min-width: 769px) and (pointer: fine)').matches;
+  }, []);
+
+  const handleArtworkInteraction = useCallback((event) => {
+    if (!isArtworkFirstMode() || showCanvas) return;
+    if (event.target.closest('button, a, .category-menu, .favorites-list')) return;
+
+    clearTimeout(artworkInfoTimerRef.current);
+    setArtworkInfoVisible((visible) => {
+      const nextVisible = !visible;
+      if (nextVisible) {
+        artworkInfoTimerRef.current = setTimeout(() => setArtworkInfoVisible(false), 7000);
+      }
+      return nextVisible;
+    });
+  }, [isArtworkFirstMode, showCanvas]);
+
   const addToFavorites = useCallback((item) => {
     setFavorites((prev) => [...prev, item]);
     saveFavorite(item);
@@ -97,6 +110,7 @@ function App() {
 
   const handleSelectFavorite = useCallback((item) => {
     setSelectedArtwork(item);
+    setZoomArtwork(item);
     setShowFavorites(false);
     setShowCanvas(true);
   }, []);
@@ -108,26 +122,38 @@ function App() {
 
   const handleExitCanvas = useCallback(() => {
     setShowCanvas(false);
+    setZoomArtwork(null);
+    pendingWheelDeltaRef.current = 0;
   }, []);
 
-  // Handle category and subcategory selection
   const handleCategorySelect = useCallback((category, subcategory) => {
+    setSelectedArtwork(null);
+    setArtworkInfoVisible(false);
+    clearTimeout(artworkInfoTimerRef.current);
     setSelectedCategory(category);
     setSelectedSubcategory(subcategory);
-    refresh();
-  }, [refresh]);
+  }, []);
 
   const artworkToShow = selectedArtwork || artwork;
 
-  // Fallback UI
-  if (loading) {
-    return <div className="fallback">Loading...</div>;
-  }
+  const handleArtworkWheel = useCallback((event) => {
+    if (!isDesktop() || showCanvas || !artworkToShow?.primaryImage) return;
+    if (event.target.closest('button, a, .category-menu, .favorites-list')) return;
+
+    event.preventDefault();
+    pendingWheelDeltaRef.current = event.deltaY;
+    setZoomArtwork(artworkToShow);
+    setArtworkInfoVisible(false);
+    clearTimeout(artworkInfoTimerRef.current);
+    setShowCanvas(true);
+  }, [artworkToShow, isDesktop, showCanvas]);
+
+  if (loading) return <div className="fallback">Loading...</div>;
 
   if (!artworkToShow?.primaryImage) {
     return (
       <div className="fallback">
-        <p>{error || 'No artwork available. Please refresh the page.'}</p>
+        <p>{error || 'No artwork available. Please try again.'}</p>
         <RefreshButton onRefresh={refresh} />
       </div>
     );
@@ -135,16 +161,17 @@ function App() {
 
   return (
     <div
-      className="App"
+      className={`App ${artworkInfoVisible ? 'artwork-info-visible' : ''}`}
+      onClick={handleArtworkInteraction}
+      onWheel={handleArtworkWheel}
       style={{
         backgroundImage: `url(${artworkToShow.primaryImage})`,
         backgroundPosition: 'center',
         backgroundSize: 'contain',
       }}
     >
-      {/* Add the app title with hide/show behavior */}
       <div className={`app-title ${hideButtons ? 'hidden' : 'visible'}`} id="appTitle">
-        Art Wallpaper App
+        Art Wallpaper Museum
       </div>
       <ArtworkInfo artwork={artworkToShow} />
       {showText && (
@@ -155,41 +182,20 @@ function App() {
       )}
       <CategoryMenu hidden={hideButtons} onSelectCategory={handleCategorySelect} />
       <div className="button-container">
-        <button
-          className={`favorite-button ${hideButtons ? 'hidden' : 'visible'}`}
-          onClick={() => addToFavorites(artworkToShow)}
-        >
+        <button className={`favorite-button ${hideButtons ? 'hidden' : 'visible'}`} onClick={() => addToFavorites(artworkToShow)}>
           ❤️ Favorite
         </button>
-        <button
-          className={`favorites-toggle ${hideButtons ? 'hidden' : 'visible'}`}
-          onClick={toggleFavorites}
-        >
+        <button className={`favorites-toggle ${hideButtons ? 'hidden' : 'visible'}`} onClick={toggleFavorites}>
           Show Favorites
         </button>
       </div>
       {showFavorites && (
-        <FavoritesList
-          favorites={favorites}
-          onSelectFavorite={handleSelectFavorite}
-          onClearFavorites={handleClearFavorites}
-        />
+        <FavoritesList favorites={favorites} onSelectFavorite={handleSelectFavorite} onClearFavorites={handleClearFavorites} />
       )}
       {showCanvas && (
         <>
-          <div
-            id="openseadragon-canvas"
-            style={{
-              width: '100%',
-              height: '100%',
-              position: 'absolute',
-              top: 0,
-              left: 0,
-            }}
-          />
-          <button className="exit-canvas-button" onClick={handleExitCanvas}>
-            Exit
-          </button>
+          <div id="openseadragon-canvas" style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }} />
+          <button className="exit-canvas-button" onClick={handleExitCanvas}>Exit</button>
         </>
       )}
       <RefreshButton hidden={hideButtons} onRefresh={refresh} />

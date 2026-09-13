@@ -1,0 +1,38 @@
+name: Validate Art Wallpaper Museum v2
+
+on:
+  push:
+    branches:
+      - art-wallpaper-museum-v2
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Run tests
+        run: yarn test --watchAll=false
+        env:
+          CI: true
+
+      - name: Check public museum APIs
+        run: |
+          curl --fail --silent --show-error "https://collectionapi.metmuseum.org/public/collection/v1.1/search?hasImages=true&isPublicDomain=true&q=painting&limit=1" > /dev/null
+          curl --fail --silent --show-error "https://openaccess-api.clevelandart.org/api/artworks/?has_image=1&limit=1" > /dev/null
+
+      - name: Production build
+        run: yarn build
+        env:
+          CI: true

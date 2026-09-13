@@ -1,87 +1,141 @@
+import { useEffect, useRef, useState, useCallback } from 'react';
+import getRandomArtwork from './services/museums/artworkService';
+import toLegacyArtwork from './services/museums/artworkAdapter';
 
-import { useEffect, useState, useCallback } from 'react';
-import { fetchArtwork } from './api';
-
-// Default artwork for fallback cases
-const defaultArtwork = {
-  primaryImage: '/images/fallback-artwork.png', // Ensure this file exists in public/images
-  title: 'Default Artwork',
-  objectDate: 'Unknown',
-  artistDisplayName: 'Unknown Artist',
-  medium: 'Unknown Medium',
-  source: 'Fallback',
+const museumIdByLabel = {
+  'The Metropolitan Museum of Art': 'met',
+  Metropolitan: 'met',
+  'Cleveland Museum of Art': 'cleveland',
+  Cleveland: 'cleveland',
+  'Harvard Art Museums': 'harvard',
+  Harvard: 'harvard',
 };
 
+const typeByLabel = {
+  Painting: 'Painting',
+  Sculpture: 'Sculpture',
+  Photography: 'Photography',
+};
+
+const periodByLabel = {
+  'Pre-1600': { dateBegin: 0, dateEnd: 1599 },
+  '1600-1800': { dateBegin: 1600, dateEnd: 1800 },
+  '1800-1900': { dateBegin: 1800, dateEnd: 1900 },
+  '1900-Present': { dateBegin: 1900, dateEnd: new Date().getFullYear() },
+};
+
+const movements = new Set(['Renaissance', 'Baroque', 'Impressionism', 'Modernism']);
+
+function buildArtworkRequest(query, subcategory) {
+  if (query === 'random') {
+    return { filters: { type: 'Painting' } };
+  }
+
+  if (query === 'museum' && museumIdByLabel[subcategory]) {
+    return {
+      museumId: museumIdByLabel[subcategory],
+      filters: { type: 'Painting' },
+    };
+  }
+
+  if (query === 'type' && typeByLabel[subcategory]) {
+    return { filters: { type: typeByLabel[subcategory] } };
+  }
+
+  if (query === 'period' && periodByLabel[subcategory]) {
+    return {
+      filters: {
+        type: 'Painting',
+        ...periodByLabel[subcategory],
+      },
+    };
+  }
+
+  if (query === 'movement' && movements.has(subcategory)) {
+    return {
+      filters: {
+        type: 'Painting',
+        movement: subcategory,
+      },
+    };
+  }
+
+  return { query: subcategory || 'art' };
+}
+
 /**
- * Custom hook to fetch and manage artwork data.
- * Returns artwork, loading state, error message, and refresh function.
- * @param {string} query - Search query (default: 'painting')
- * @param {string} subcategory - Subcategory for filtering (optional)
+ * Custom hook backed by the unified museum provider system.
  */
-const useArtwork = (query = 'painting', subcategory = '') => {
+const useArtwork = (query = 'random', subcategory = '') => {
   const [artwork, setArtwork] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const previousArtworkIdRef = useRef(null);
 
-  // Function to fetch artwork data
   const getArtwork = useCallback(async () => {
-    console.log('getArtwork called with:', { query, subcategory });
     try {
       setLoading(true);
       setError(null);
-      const { artwork: fetchedArtwork, error: fetchError } = await fetchArtwork(query, subcategory);
-      console.log('Fetched artwork in useArtwork:', { artwork: fetchedArtwork, error: fetchError });
 
-      // Validate fetched artwork
-      if (fetchError || !fetchedArtwork || !fetchedArtwork.primaryImage) {
-        console.warn('No valid artwork received, using default. Details:', {
-          fetchError,
-          fetchedArtwork,
-          hasPrimaryImage: fetchedArtwork?.primaryImage,
-        });
-        setError(fetchError || 'No valid artwork found. Using default artwork.');
-        setArtwork(defaultArtwork);
-      } else {
-        // Ensure all fields have fallback values
-        const validatedArtwork = {
-          primaryImage: fetchedArtwork.primaryImage,
-          title: fetchedArtwork.title || 'Untitled',
-          objectDate: fetchedArtwork.objectDate || 'Unknown Date',
-          artistDisplayName: fetchedArtwork.artistDisplayName || 'Unknown Artist',
-          medium: fetchedArtwork.medium || 'Unknown Medium',
-          source: fetchedArtwork.source || 'Unknown Source',
-        };
-        console.log('Setting validated artwork:', validatedArtwork);
-        setArtwork(validatedArtwork);
+      const request = buildArtworkRequest(query, subcategory);
+      let normalizedArtwork = null;
+
+      // Avoid showing the exact same artwork on consecutive refreshes when
+      // the selected filter has enough alternatives. A small retry cap keeps
+      // network usage bounded for narrow queries that may only have one match.
+      for (let attempt = 0; attempt < 3; attempt += 1) {
+        normalizedArtwork = await getRandomArtwork(request);
+        if (
+          !normalizedArtwork?.id ||
+          normalizedArtwork.id !== previousArtworkIdRef.current ||
+          attempt === 2
+        ) {
+          break;
+        }
       }
+
+      const fetchedArtwork = toLegacyArtwork(normalizedArtwork);
+
+      if (!fetchedArtwork?.primaryImage) {
+        setArtwork(null);
+        setError('No artwork with a usable image was found. Please try again.');
+        return;
+      }
+
+      previousArtworkIdRef.current = normalizedArtwork?.id || null;
+
+      setArtwork({
+        ...fetchedArtwork,
+        primaryImage: fetchedArtwork.primaryImage,
+        title: fetchedArtwork.title || 'Untitled',
+        objectDate: fetchedArtwork.objectDate || 'Unknown Date',
+        artistDisplayName: fetchedArtwork.artistDisplayName || 'Unknown Artist',
+        medium: fetchedArtwork.medium || 'Unknown Medium',
+        source: fetchedArtwork.source || 'Unknown Source',
+      });
     } catch (err) {
-      console.error('Error in useArtwork:', err.message, err.stack);
-      setError(err.message || 'Something went wrong. Please refresh the page.');
-      setArtwork(defaultArtwork);
+      console.error('Error in useArtwork:', err);
+      setArtwork(null);
+      setError(
+        typeof navigator !== 'undefined' && !navigator.onLine
+          ? 'You are offline. Reconnect to the internet and try again.'
+          : 'Unable to load artwork right now. Please try again.'
+      );
     } finally {
       setLoading(false);
     }
   }, [query, subcategory]);
 
-  // Fetch artwork on mount and every 10 minutes
   useEffect(() => {
+    previousArtworkIdRef.current = null;
     getArtwork();
-
-    // Set interval to refresh every 10 minutes
-    const interval = setInterval(() => {
-      console.log('Refreshing artwork via interval');
-      getArtwork();
-    }, 600000); // 10 minutes in milliseconds
-
-    // Cleanup interval on unmount
+    const interval = setInterval(getArtwork, 600000);
     return () => clearInterval(interval);
   }, [getArtwork]);
 
-  // Manual refresh function
-  const refresh = () => {
-    console.log('Manual refresh triggered');
+  const refresh = useCallback(() => {
     getArtwork();
-  };
+  }, [getArtwork]);
 
   return { artwork, loading, error, refresh };
 };
