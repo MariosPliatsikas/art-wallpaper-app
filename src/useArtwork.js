@@ -66,13 +66,16 @@ function buildArtworkRequest(query, subcategory) {
 /**
  * Custom hook backed by the unified museum provider system.
  */
-const useArtwork = (query = 'random', subcategory = '') => {
+const useArtwork = (query = 'random', subcategory = '', paused = false) => {
   const [artwork, setArtwork] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const previousArtworkIdRef = useRef(null);
+  const requestRef = useRef(0);
+  const [secondsRemaining, setSecondsRemaining] = useState(600);
 
   const getArtwork = useCallback(async () => {
+    const requestId = ++requestRef.current;
     try {
       setLoading(true);
       setError(null);
@@ -94,6 +97,7 @@ const useArtwork = (query = 'random', subcategory = '') => {
         }
       }
 
+      if (requestId !== requestRef.current) return;
       const fetchedArtwork = toLegacyArtwork(normalizedArtwork);
 
       if (!fetchedArtwork?.primaryImage) {
@@ -114,7 +118,7 @@ const useArtwork = (query = 'random', subcategory = '') => {
         source: fetchedArtwork.source || 'Unknown Source',
       });
     } catch (err) {
-      console.error('Error in useArtwork:', err);
+      if (requestId !== requestRef.current) return;
       setArtwork(null);
       setError(
         typeof navigator !== 'undefined' && !navigator.onLine
@@ -126,22 +130,31 @@ const useArtwork = (query = 'random', subcategory = '') => {
             : 'Unable to load artwork right now. Please try again.'
       );
     } finally {
-      setLoading(false);
+      if (requestId === requestRef.current) { setLoading(false); setSecondsRemaining(600); }
     }
   }, [query, subcategory]);
 
   useEffect(() => {
     previousArtworkIdRef.current = null;
     getArtwork();
-    const interval = setInterval(getArtwork, 600000);
-    return () => clearInterval(interval);
+    return () => { requestRef.current += 1; };
   }, [getArtwork]);
+
+  useEffect(() => {
+    if (paused || loading) return undefined;
+    const interval = setInterval(() => setSecondsRemaining(value => Math.max(0, value - 1)), 1000);
+    return () => clearInterval(interval);
+  }, [paused, loading]);
+
+  useEffect(() => {
+    if (secondsRemaining === 0 && !paused && !loading) getArtwork();
+  }, [secondsRemaining, paused, loading, getArtwork]);
 
   const refresh = useCallback(() => {
     getArtwork();
   }, [getArtwork]);
 
-  return { artwork, loading, error, refresh };
+  return { artwork, loading, error, refresh, secondsRemaining };
 };
 
 export default useArtwork;

@@ -1,159 +1,147 @@
-
-/* src/App.css */
-
-/* Main application container */
-.App {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-  background-color: black;
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
-  overflow: hidden;
+.museum-app { --teal: #83c5bb; position: relative; height: 100vh; height: 100dvh; width: 100%; overflow: hidden; background: #0b0e0e; color: #f1eee8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+.museum-app * { box-sizing: border-box; }
+.museum-app button { font: inherit; cursor: pointer; color: inherit; border: 1px solid #ffffff24; background: #ffffff08; border-radius: 12px; min-height: 44px; padding: 10px 16px; transition: background .2s; }
+.museum-app button:hover { background: #ffffff16; }
+.museum-app button:focus-visible, .museum-app a:focus-visible, .art-stage:focus-visible { outline: 2px solid var(--teal); outline-offset: 4px; }
+.museum-app button:disabled { opacity: .4; cursor: wait; }
+.art-stage { position: absolute; inset: 0; display: grid; place-items: center; cursor: default; }
+.hero-art { width: 100%; height: 100%; object-fit: contain; user-select: none; }
+.auto-hide { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .6s, visibility .6s; }
+.controls-visible .auto-hide, .auto-hide:focus-within { opacity: 1; visibility: visible; pointer-events: auto; }
+.museum-header { position: absolute; inset: 0 0 auto; padding: max(28px, env(safe-area-inset-top)) 34px 45px; display: flex; align-items: center; justify-content: space-between; background: linear-gradient(#000b, transparent); }
+.wordmark { display: flex; align-items: center; gap: 12px; font-size: 12px; letter-spacing: .18em; font-weight: 600; }
+.brand-symbol { color: var(--teal); font-size: 35px; }
+.wordmark small { display: block; font-weight: 400; font-size: 11px; letter-spacing: .03em; color: #ddd8c7b3; margin-top: 6px; }
+.collection-button { backdrop-filter: blur(20px); font-size: 13px !important; }
+.collection-button span { margin-left: 12px; color: var(--teal); }
+.art-caption { position: absolute; left: 36px; bottom: 147px; max-width: min(570px, 65vw); text-shadow: 0 2px 14px #000; }
+.art-caption > span, .eyebrow { text-transform: uppercase; font-size: 10px; letter-spacing: .17em; color: var(--teal); }
+.art-caption h1 { font-family: Georgia, serif; font-size: clamp(24px, 3vw, 40px); font-weight: 400; line-height: 1.15; margin: 12px 0; }
+.art-caption p { color: #e5dfd2; font-size: 13px; line-height: 1.5; }
+.control-dock { position: absolute; left: 50%; bottom: max(28px, env(safe-area-inset-bottom)); transform: translateX(-50%); display: flex; align-items: center; gap: 5px; padding: 7px; border: 1px solid #ffffff20; border-radius: 20px; background: #171d1ee8; backdrop-filter: blur(24px); box-shadow: 0 15px 50px #0005; }
+.control-dock button { border: 0; display: grid; gap: 5px; place-items: center; padding: 8px 20px; font-size: 11px; background: transparent; min-width: 70px; }
+.control-dock button > span { font-size: 23px; line-height: 1; }
+.control-dock button[aria-pressed=true] { color: var(--teal); }
+.dock-divider { width: 1px; height: 30px; background: #ffffff20; }
+.control-dock .next-button { background: #83c5bb20; color: #b3e2db; }
+.playback { position: absolute; right: 34px; bottom: 152px; display: flex; align-items: center; gap: 12px; font-size: 12px; text-shadow: 0 2px 10px #000; }
+.playback button { border-radius: 50%; width: 44px; padding: 0; background: #101616bd; }
+.playback small { display: block; font-size: 10px; color: #d4d7d0; margin-top: 5px; }
+.loading-pill, .toast { position: absolute; left: 50%; top: 95px; transform: translateX(-50%); background: #152523eb; border: 1px solid #83c5bb66; border-radius: 30px; padding: 12px 22px; font-size: 13px; z-index: 40; max-width: 90%; text-align: center; }
+.error-card { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); background: #18201ff2; padding: 25px; border-radius: 20px; width: min(440px, 90%); z-index: 10; }
+.error-card p { line-height: 1.6; }
+.error-card button { margin: 4px; }
+.panel-backdrop { position: absolute; inset: 0; z-index: 30; background: #0007; backdrop-filter: blur(5px); }
+.museum-panel { position: absolute; top: 20px; right: 20px; bottom: 20px; width: min(470px, calc(100% - 40px)); background: #151c1bf7; border: 1px solid #ffffff1a; border-radius: 22px; padding: 28px; overflow-y: auto; overscroll-behavior: contain; box-shadow: 0 20px 90px #0006; animation: panel-in .25s ease-out; }
+@keyframes panel-in { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+.panel-heading { display: flex; justify-content: space-between; gap: 15px; align-items: center; margin-bottom: 22px; }
+.panel-heading h2 { font-family: Georgia, serif; font-size: 29px; line-height: 1.2; font-weight: 400; margin: 10px 0 0; }
+.panel-heading button { font-size: 25px; flex-shrink: 0; padding: 5px; width: 44px; }
+.panel-intro { color: #b9c3bc; line-height: 1.6; font-size: 14px; }
+.filter-group { border-top: 1px solid #ffffff12; padding-top: 15px; margin-top: 24px; }
+.filter-group h3 { font-size: 11px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: #b5beb9; }
+.filter-options { display: flex; flex-wrap: wrap; gap: 8px; }
+.museum-app .filter-chip { font-size: 12px; border-radius: 10px; padding: 10px 12px; text-align: left; }
+.museum-app .filter-chip.selected { border-color: #83c5bb70; background: #83c5bb17; color: #bce6df; }
+.detail-title { font-family: Georgia, serif; font-size: 32px; font-weight: 400; line-height: 1.25; margin-bottom: 10px; }
+.detail-artist { color: #c4cec7; line-height: 1.5; }
+.source-label { display: block; margin-top: 30px; line-height: 1.7; }
+.museum-panel dl { margin: 30px 0; }
+.museum-panel dl > div { border-top: 1px solid #ffffff12; padding: 15px 0; }
+.museum-panel dt { font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: #9baaa2; }
+.museum-panel dd { margin: 8px 0 0; line-height: 1.6; font-size: 14px; }
+.museum-link { color: var(--teal); font-size: 14px; text-decoration: none; }
+.empty-collection { font-family: Georgia, serif; font-size: 25px; padding: 50px 0; }
+.empty-collection small { display: block; font: 14px/1.6 sans-serif; color: #abb9b1; margin-top: 15px; }
+.collection-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.collection-grid button { padding: 8px; text-align: left; }
+.collection-grid img { width: 100%; height: 140px; object-fit: contain; background: #090c0b; border-radius: 7px; }
+.collection-grid strong, .collection-grid small { display: block; font-size: 12px; margin-top: 8px; line-height: 1.4; }
+.collection-grid small { color: #acbcb3; font-size: 10px; }
+.zoom-layer { position: absolute; inset: 0; background: #0b0e0e; z-index: 50; }
+#openseadragon-canvas { position: absolute; inset: 0; touch-action: none; }
+.zoom-tools { position: absolute; top: max(18px, env(safe-area-inset-top)); right: max(18px, env(safe-area-inset-right)); display: flex; gap: 8px; z-index: 1; }
+.zoom-tools button { background: #182321e8; backdrop-filter: blur(15px); font-size: 12px; }
+@media(max-width: 700px) {
+ .museum-header { padding: max(18px, env(safe-area-inset-top)) 18px 40px; }
+ .wordmark { font-size: 10px; gap: 8px; letter-spacing: .12em; }
+ .wordmark small { font-size: 9px; }
+ .collection-button { padding: 8px 10px !important; font-size: 11px !important; }
+ .art-caption { left: 22px; right: 22px; bottom: 181px; max-width: none; }
+ .art-caption h1 { font-size: 26px; }
+ .art-caption p { font-size: 11px; }
+ .playback { left: 22px; right: auto; bottom: 112px; font-size: 11px; }
+ .playback small { font-size: 9px; }
+ .control-dock { bottom: max(18px, env(safe-area-inset-bottom)); gap: 0; width: calc(100% - 28px); justify-content: space-between; border-radius: 17px; }
+ .control-dock button { min-width: 0; flex: 1; padding: 9px 5px; font-size: 10px; }
+ .control-dock button > span { font-size: 22px; }
+ .dock-divider { margin: 0 4px; }
+ .museum-panel { top: auto; right: 0; bottom: 0; width: 100%; max-height: 85%; border-radius: 24px 24px 0 0; padding: 24px 24px max(28px, env(safe-area-inset-bottom)); }
 }
+@media(orientation: landscape) and (max-height: 500px) {
+ .museum-header { padding: 12px 22px; }
+ .wordmark small { display: none; }
+ .art-caption { bottom: 100px; left: 24px; max-width: 50%; }
+ .art-caption h1 { font-size: 23px; margin: 7px 0; }
+ .art-caption p { font-size: 10px; margin: 5px 0; }
+ .playback { right: 22px; left: auto; bottom: 105px; }
+ .playback small { display: none; }
+ .control-dock { width: auto; bottom: 14px; }
+ .control-dock button { min-width: 65px; padding: 7px 14px; }
+ .museum-panel { top: 10px; right: 10px; bottom: 10px; width: min(470px, 85%); max-height: none; border-radius: 20px; }
+}
+@media(prefers-reduced-motion: reduce) { .museum-app *, .museum-app *::before { animation: none !important; transition: none !important; } }
 
-.App.loading { display: flex; justify-content: center; align-items: center; font-size: 2rem; color: white; background-color: black; }
-
-.artwork-info {
+/* Fit the complete artwork inside the viewport. */
+.museum-app .art-stage {
+  display: block;
+  min-width: 0;
+  min-height: 0;
+}
+.museum-app .hero-art {
   position: absolute;
-  bottom: 20px;
-  left: 20px;
-  background: rgba(0, 0, 0, 0.7);
-  padding: 10px;
-  border-radius: 5px;
-  color: white;
-  font-size: 1rem;
-  max-width: 300px;
-  font-family: 'Dancing Script', cursive;
-  transition: opacity 0.3s ease;
-}
-.artwork-info p { margin: 5px 0; }
-.artist-name { font-weight: bold; font-size: 1.2rem; }
-.artwork-title { font-style: italic; }
-.artwork-date, .artwork-medium, .artwork-source { color: rgba(255, 255, 255, 0.8); }
-.artwork-source { font-style: italic; margin-top: 5px; }
-
-.loading-spinner { border: 4px solid rgba(255,255,255,.3); border-top: 4px solid white; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
-@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-.floating-text { position: absolute; left: 50%; transform: translate(-50%,-50%); font-family: 'Dancing Script', cursive; color: rgba(255,255,255,.8); text-align: center; font-size: 1.5rem; opacity: 0; transition: opacity 1s ease-in-out; animation: float 20s ease-in-out infinite; }
-.floating-text.visible { opacity: 1; }
-.floating-text.center { top: 30%; }
-.floating-text.bottom { top: 70%; }
-
-.button-container { position: absolute; top: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 1000; }
-.favorite-button, .favorites-toggle { background: rgba(255,255,255,.3); border: 2px solid rgba(255,255,255,.5); border-radius: 5px; padding: 8px 16px; font-family: 'Dancing Script', cursive; font-size: 1.2rem; color: white; cursor: pointer; transition: opacity 3s ease, background .3s ease, transform .3s ease; }
-.favorite-button:hover, .favorite-button:focus, .favorites-toggle:hover, .favorites-toggle:focus { background: rgba(255,255,255,.6); transform: scale(1.05); outline: 2px solid white; outline-offset: 2px; }
-.favorite-button.hidden, .favorites-toggle.hidden { opacity: 0; pointer-events: none; }
-
-.category-menu { position: absolute; top: 120px; left: 20px; display: flex; gap: 10px; z-index: 1000; opacity: 1; transition: opacity 3s ease; min-width: 150px; font-family: 'Dancing Script', cursive; }
-.category-menu.hidden { opacity: 0; pointer-events: none; }
-.category-menu.visible { opacity: 1; pointer-events: auto; }
-.category-item { position: relative; }
-.category-button { background: rgba(255,255,255,.3); border: 2px solid rgba(255,255,255,.5); border-radius: 5px; padding: 8px 16px; font-family: 'Dancing Script', cursive; font-size: 1.2rem; color: #fff; cursor: pointer; transition: opacity 3s ease, background .3s ease, transform .3s ease; }
-.category-button:hover, .category-button:focus { background: rgba(255,255,255,.6); transform: scale(1.05); outline: 2px solid #fff; outline-offset: 2px; }
-.subcategory-menu { display: none; position: absolute; top: 100%; left: 0; background: rgba(0,0,0,.8); border-radius: 5px; padding: 10px; flex-direction: column; gap: 5px; }
-.category-item:hover .subcategory-menu { display: flex; }
-.subcategory-button { background: transparent; border: none; font-family: 'Dancing Script', cursive; font-size: 1rem; color: #fff; cursor: pointer; text-align: left; transition: color .3s ease; }
-.subcategory-button:hover, .subcategory-button:focus { color: #e5ecf3; text-decoration: underline; }
-.category-menu p { color: white; font-size: 16px; margin: 0; padding: 5px 10px; }
-
-.exit-canvas-button { position: absolute; top: 10px; right: 10px; background: #ff4d4d; border: none; border-radius: 5px; padding: 10px 20px; font-family: 'Dancing Script', cursive; font-size: 1rem; color: white; cursor: pointer; z-index: 1000; transition: all .3s ease; }
-.exit-canvas-button:hover, .exit-canvas-button:focus { background: #e63939; transform: scale(1.05); outline: 2px solid white; outline-offset: 2px; }
-
-.favorites-list { position: absolute; top: 50px; right: 10px; background: rgba(0,0,0,.8); padding: 10px; border-radius: 5px; max-width: 300px; max-height: 400px; overflow-y: auto; color: white; font-family: 'Dancing Script', cursive; }
-.favorites-list ul { list-style: none; padding: 0; }
-.favorites-list li { display: flex; align-items: center; margin-bottom: 10px; cursor: pointer; }
-.favorites-list img { width: 50px; height: 50px; margin-right: 10px; border-radius: 5px; }
-.clear-favorites-button { background: linear-gradient(to right,#3f322d,#483027); border: none; border-radius: 5px; padding: 10px 15px; font-size: 1rem; color: white; cursor: pointer; margin-bottom: 10px; transition: all .3s ease; }
-.clear-favorites-button:hover, .clear-favorites-button:focus { background: linear-gradient(to right,#554441,#ff0000); transform: scale(1.05); }
-
-.fallback { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; background-color: black; color: #b6b3b3; font-family: 'Dancing Script', cursive; font-size: 2.3rem; text-align: center; padding: 20px; }
-.fallback p { font-size: 1.8rem; margin: 0 0 20px; padding: 0; }
-.fallback .refresh-button { padding: 15px 20px; font-size: 20px; background: rgba(255,255,255,.3); color: white; border: 2px solid rgba(255,255,255,.5); border-radius: 20px; cursor: pointer; }
-button.refresh-button { position: absolute; bottom: 20px; right: 20px; padding: 15px 20px; font-size: 20px; font-family: 'Dancing Script', cursive; background: rgba(255,255,255,.3); color: white; border: 2px solid rgba(255,255,255,.5); border-radius: 20px; cursor: pointer; text-shadow: 2px 2px 5px rgba(0,0,0,.7); transition: opacity 3s ease, background .3s ease, transform .3s ease; }
-button.refresh-button.hidden { opacity: 0; pointer-events: none; }
-
-.google-search-link { color: #8a959f; text-decoration: none; }
-.google-search-link:hover, .google-search-link:focus { color: #e5ecf3; text-decoration: underline; }
-img { max-width: 100%; height: auto; }
-
-@media (max-width: 768px) {
-  .artwork-info { bottom: 15px; left: 15px; font-size: .9rem; max-width: 250px; }
-  .floating-text { font-size: 1.2rem; }
-  .button-container { top: 15px; right: 15px; flex-direction: column; }
-  .favorite-button, .favorites-toggle { font-size: 1rem; padding: 6px 12px; }
-  .category-menu { top: 110px; left: 15px; flex-direction: column; }
-  .category-button { font-size: 1rem; padding: 6px 12px; }
-  .exit-canvas-button { padding: 8px 16px; font-size: .9rem; }
-  .favorites-list { max-width: 250px; max-height: 300px; }
-  .refresh-button { bottom: 15px; right: 15px; font-size: 16px; padding: 10px 15px; }
-  .fallback { font-size: 1.8rem; }
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: center;
 }
 
-@media (max-width: 480px) {
-  .artwork-info { bottom: 10px; left: 10px; font-size: .8rem; max-width: 200px; }
-  .floating-text { font-size: 1rem; }
-  .button-container { top: 10px; right: 10px; }
-  .favorite-button, .favorites-toggle { font-size: .9rem; padding: 5px 10px; }
-  .category-menu { top: 100px; left: 10px; }
-  .category-button { font-size: .9rem; padding: 5px 10px; }
-  .exit-canvas-button { padding: 6px 12px; font-size: .8rem; }
-  .favorites-list { max-width: 200px; max-height: 250px; }
-  .refresh-button { bottom: 10px; right: 10px; font-size: 14px; padding: 8px 12px; }
-  .fallback { font-size: 1.5rem; }
+/* Readable captions over both light and dark artworks. */
+.art-caption {
+  padding: 16px 20px;
+  border-radius: 16px;
+  background: rgba(11, 18, 18, .88);
+  backdrop-filter: blur(14px);
+  text-shadow: none;
+}
+.art-caption h1 { color: #ffffff; }
+.art-caption p { color: #f0f2ed; }
+.art-caption > span { color: #b2e5dc; }
+
+.playback {
+  padding: 10px 14px;
+  border-radius: 16px;
+  background: rgba(11, 18, 18, .88);
+  backdrop-filter: blur(14px);
+  color: #ffffff;
+  text-shadow: none;
+}
+.playback small { color: #e2e9e4; }
+
+.collection-button {
+  background: rgba(11, 18, 18, .9) !important;
 }
 
-/* Desktop artwork-first mode: metadata appears only after clicking the artwork. */
-@media (min-width: 769px) and (pointer: fine) {
-  .artwork-info { opacity: 0; pointer-events: none; }
-  .artwork-info-visible .artwork-info { opacity: 1; pointer-events: auto; }
-}
-
-/* Artwork-first mobile landscape. Metadata is hidden until the user taps the artwork. */
-@media (orientation: landscape) and (max-height: 500px) and (pointer: coarse) {
-  .artwork-info { opacity: 0; pointer-events: none; max-width: min(300px, 42vw); font-size: .82rem; bottom: 12px; left: 12px; }
-  .artwork-info-visible .artwork-info { opacity: 1; pointer-events: auto; }
-  .artwork-info-visible .artwork-info .artist-name { font-size: 1rem; }
-  .floating-text { display: none; }
-  .category-menu { top: 12px; left: 12px; flex-direction: row; gap: 6px; }
-  .category-button, .favorite-button, .favorites-toggle { font-size: .8rem; padding: 5px 9px; }
-  .button-container { top: 12px; right: 12px; }
-}
-
-/* Keep gestures inside the image viewer and controls above it. */
-.App { height: 100vh; height: 100dvh; }
-#openseadragon-canvas { z-index: 1100; touch-action: none; }
-.exit-canvas-button { z-index: 1200; }
-.zoom-button { min-width: 44px; min-height: 44px; }
-.category-item:focus-within .subcategory-menu { display: flex; }
-
-/* Hide metadata with controls, including portrait mode. */
-.App.controls-hidden .artwork-info,
-.App.controls-hidden .floating-text {
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* Hide overlays immediately when a pinch starts. */
-.App.controls-hidden .app-title,
-.App.controls-hidden .category-menu,
-.App.controls-hidden .button-container,
-.App.controls-hidden .refresh-button,
-.App.controls-hidden .favorites-list {
-  opacity: 0;
-  pointer-events: none;
-  transition: none;
-}
-
-/* Keep only Exit over the active viewer. */
-.App.viewer-open > :not(#openseadragon-canvas):not(.exit-canvas-button) {
-  visibility: hidden;
-  pointer-events: none;
+/* Immediately clear overlays during a two-finger gesture. */
+.museum-app.gesture-clean .auto-hide {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transition: none !important;
 }
