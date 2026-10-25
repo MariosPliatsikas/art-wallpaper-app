@@ -6,7 +6,9 @@ const MUSEUM_NAME = 'Harvard Art Museums';
 async function fetchJson(url) {
   const response = await fetch(url);
   if (!response.ok) {
-    throw new Error(`Harvard API request failed: ${response.status}`);
+    throw new Error(response.status === 401 || response.status === 403
+      ? 'Harvard rejected the API key. Check the local configuration.'
+      : `Harvard API request failed (HTTP ${response.status}). Please try again.`);
   }
   return response.json();
 }

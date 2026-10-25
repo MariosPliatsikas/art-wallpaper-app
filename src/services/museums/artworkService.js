@@ -14,7 +14,9 @@ export async function getRandomArtwork({ museumId = '', query = '', filters = {}
     : shuffled(getMuseumProviders());
 
   if (!providers.length) {
-    throw new Error(`Unknown museum provider: ${museumId}`);
+    throw new Error(museumId === 'harvard'
+      ? 'Harvard is unavailable: configure its API key before starting the app.'
+      : `Unknown museum provider: ${museumId}`);
   }
 
   const request = {
@@ -29,6 +31,7 @@ export async function getRandomArtwork({ museumId = '', query = '', filters = {}
       const artwork = await provider.getRandomArtwork(request);
       if (artwork?.image) return artwork;
     } catch (error) {
+      if (museumId) throw error;
       errors.push(`${provider.name}: ${error.message}`);
       console.warn(`Museum provider failed: ${provider.id}`, error);
     }
