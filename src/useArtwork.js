@@ -119,7 +119,11 @@ const useArtwork = (query = 'random', subcategory = '') => {
       setError(
         typeof navigator !== 'undefined' && !navigator.onLine
           ? 'You are offline. Reconnect to the internet and try again.'
-          : 'Unable to load artwork right now. Please try again.'
+          : query === 'museum' && subcategory.includes('Harvard')
+            ? (err.message.startsWith('Harvard ') || err.message.startsWith('No Harvard ')
+                ? err.message
+                : 'Harvard could not load. Check your connection and try again.')
+            : 'Unable to load artwork right now. Please try again.'
       );
     } finally {
       setLoading(false);

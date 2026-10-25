@@ -22,14 +22,20 @@ function App() {
   const [showCanvas, setShowCanvas] = useState(false);
   const [artworkInfoVisible, setArtworkInfoVisible] = useState(false);
   const artworkInfoTimerRef = useRef(null);
-  const pendingWheelDeltaRef = useRef(0);
+
 
   useEffect(() => {
     const textTimer = setTimeout(() => setShowText(true), 15000);
     const hideTextTimer = showText ? setTimeout(() => setShowText(false), 10000) : null;
 
     let hideButtonsTimeout;
-    const showButtons = () => {
+    const showButtons = (event) => {
+      if (event?.touches?.length > 1) {
+        clearTimeout(hideButtonsTimeout);
+        setHideButtons(true);
+        setArtworkInfoVisible(false);
+        return;
+      }
       setHideButtons(false);
       clearTimeout(hideButtonsTimeout);
       hideButtonsTimeout = setTimeout(() => setHideButtons(true), 5000);
@@ -54,18 +60,11 @@ function App() {
     if (showCanvas && zoomArtwork?.primaryImage) {
       const viewer = OpenSeadragon({
         id: 'openseadragon-canvas',
-        prefixUrl: '/node_modules/openseadragon/images/',
+        showNavigationControl: false,
+        zoomPerScroll: 1.05,
+        gestureSettingsMouse: { clickToZoom: false, dblClickToZoom: true },
+        gestureSettingsTouch: { pinchToZoom: true, dragToPan: true },
         tileSources: { type: 'image', url: zoomArtwork.primaryImage },
-      });
-
-      viewer.addOnceHandler('open', () => {
-        const delta = pendingWheelDeltaRef.current;
-        if (delta !== 0) {
-          const factor = delta < 0 ? 1.25 : 0.8;
-          viewer.viewport.zoomBy(factor);
-          viewer.viewport.applyConstraints();
-          pendingWheelDeltaRef.current = 0;
-        }
       });
 
       return () => viewer.destroy();
@@ -123,7 +122,7 @@ function App() {
   const handleExitCanvas = useCallback(() => {
     setShowCanvas(false);
     setZoomArtwork(null);
-    pendingWheelDeltaRef.current = 0;
+
   }, []);
 
   const handleCategorySelect = useCallback((category, subcategory) => {
@@ -141,7 +140,7 @@ function App() {
     if (event.target.closest('button, a, .category-menu, .favorites-list')) return;
 
     event.preventDefault();
-    pendingWheelDeltaRef.current = event.deltaY;
+    if (event.deltaY === 0) return;
     setZoomArtwork(artworkToShow);
     setArtworkInfoVisible(false);
     clearTimeout(artworkInfoTimerRef.current);
@@ -161,7 +160,7 @@ function App() {
 
   return (
     <div
-      className={`App ${artworkInfoVisible ? 'artwork-info-visible' : ''}`}
+      className={`App ${artworkInfoVisible ? 'artwork-info-visible' : ''} ${hideButtons ? 'controls-hidden' : ''} ${showCanvas ? 'viewer-open' : ''}`}
       onClick={handleArtworkInteraction}
       onWheel={handleArtworkWheel}
       style={{
@@ -182,6 +181,7 @@ function App() {
       )}
       <CategoryMenu hidden={hideButtons} onSelectCategory={handleCategorySelect} />
       <div className="button-container">
+        {!showCanvas && <button className={`zoom-button favorite-button ${hideButtons ? 'hidden' : 'visible'}`} onClick={() => { setZoomArtwork(artworkToShow); setShowCanvas(true); }}>Zoom</button>}
         <button className={`favorite-button ${hideButtons ? 'hidden' : 'visible'}`} onClick={() => addToFavorites(artworkToShow)}>
           ❤️ Favorite
         </button>

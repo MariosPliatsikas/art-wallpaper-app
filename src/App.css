@@ -126,3 +126,34 @@ img { max-width: 100%; height: auto; }
   .category-button, .favorite-button, .favorites-toggle { font-size: .8rem; padding: 5px 9px; }
   .button-container { top: 12px; right: 12px; }
 }
+
+/* Keep gestures inside the image viewer and controls above it. */
+.App { height: 100vh; height: 100dvh; }
+#openseadragon-canvas { z-index: 1100; touch-action: none; }
+.exit-canvas-button { z-index: 1200; }
+.zoom-button { min-width: 44px; min-height: 44px; }
+.category-item:focus-within .subcategory-menu { display: flex; }
+
+/* Hide metadata with controls, including portrait mode. */
+.App.controls-hidden .artwork-info,
+.App.controls-hidden .floating-text {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Hide overlays immediately when a pinch starts. */
+.App.controls-hidden .app-title,
+.App.controls-hidden .category-menu,
+.App.controls-hidden .button-container,
+.App.controls-hidden .refresh-button,
+.App.controls-hidden .favorites-list {
+  opacity: 0;
+  pointer-events: none;
+  transition: none;
+}
+
+/* Keep only Exit over the active viewer. */
+.App.viewer-open > :not(#openseadragon-canvas):not(.exit-canvas-button) {
+  visibility: hidden;
+  pointer-events: none;
+}
