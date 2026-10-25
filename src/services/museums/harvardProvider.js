@@ -44,13 +44,8 @@ function classificationForType(type) {
 }
 
 export async function getRandomHarvardArtwork(input = {}) {
-  if (!config.HARVARD_API_KEY) {
-    throw new Error('Harvard API key is not configured');
-  }
-
   const { query, type, movement, dateBegin, dateEnd } = toSearchOptions(input);
   const params = new URLSearchParams({
-    apikey: config.HARVARD_API_KEY,
     hasimage: '1',
     size: '100',
     sort: 'random',
@@ -64,7 +59,7 @@ export async function getRandomHarvardArtwork(input = {}) {
     params.set('yearmade', `${dateBegin}-${dateEnd}`);
   }
 
-  const data = await fetchJson(`${config.HARVARD_API_URL}/object?${params.toString()}`);
+  const data = await fetchJson(`${config.HARVARD_API_URL}?${params.toString()}`);
   const records = (data.records || []).filter((item) => item.primaryimageurl);
 
   if (!records.length) {
@@ -78,7 +73,6 @@ export async function getRandomHarvardArtwork(input = {}) {
 export const harvardProvider = {
   id: 'harvard',
   name: MUSEUM_NAME,
-  isConfigured: () => Boolean(config.HARVARD_API_KEY),
   getRandomArtwork: getRandomHarvardArtwork,
 };
 
