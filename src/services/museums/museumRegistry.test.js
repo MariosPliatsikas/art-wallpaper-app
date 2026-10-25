@@ -6,6 +6,7 @@ import {
 
 describe('museumRegistry', () => {
   test('always exposes the configured Met and Cleveland providers', () => {
+    expect(getMuseumProvider('harvard')).toBeTruthy();
     expect(getMuseumProvider('met')).toBeTruthy();
     expect(getMuseumProvider('cleveland')).toBeTruthy();
   });
